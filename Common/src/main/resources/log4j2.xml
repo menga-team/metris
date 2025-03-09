@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns="https://logging.apache.org/xml/ns"
+               xsi:schemaLocation="
+                       https://logging.apache.org/xml/ns
+                       https://logging.apache.org/xml/ns/log4j-config-2.xsd">
+    <Appenders>
+        <Console name="stderr" target="SYSTEM_ERR">
+            <PatternLayout pattern="%cyan{%d{ISO8601}} %highlight{%-5p}{FATAL=bg_red, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue} [%t]: %m%n"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Logger name="dev.menga.metris" level="INFO"/>
+        <Root level="WARN">
+            <AppenderRef ref="stderr"/>
+        </Root>
+    </Loggers>
+</Configuration>

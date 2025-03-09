@@ -13,15 +13,47 @@
   <artifactId>Server</artifactId>
   <packaging>jar</packaging>
 
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <mainClass>dev.menga.metris.MetrisServer</mainClass>
+            </manifest>
+          </archive>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <finalName>METRIS-SERVER-full</finalName>
+          <appendAssemblyId>false</appendAssemblyId>
+
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
   <dependencies>
     <dependency>
       <groupId>dev.menga.metris</groupId>
       <artifactId>Common</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-transport</artifactId>
+      <version>4.1.119.Final</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
-
-  <build>
-  <finalName>MetrisServer-${project.version}</finalName>
-</build>
 </project>

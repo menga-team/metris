@@ -1,0 +1,124 @@
+* Cable Protocol
+
+Metris uses the cable protocol for transferring data between clients
+and the server.  It is a custom protocol designed for Metris, it
+enables low latency in intensive show-downs and provides enough
+reliability for important messages.
+
+It is built on top of UDP and every packet contains the following
+header:
+
++----+----------+-------------+------------+---------------+
+| id | sequence | reliability | magic      | payload       |
++----+----------+-------------+------------+---------------+
+| 1B | int: 4B  | 4 bits      | 2B + 4bits | ....          |
++----+----------+-------------+------------+---------------+
+| header: 8B                               | No size limit |
++------------------------------------------+---------------+
+
+The sequence is a number which is simple increased after any packet
+sent, with the exception for ACK and NAK packets, there the seq field
+is used to identify the packet in question.
+
+The magic is used to identify a given packet as a cable packet and to
+not confuse unrelated data that somehow managed to be received.  It is
+always =0xcab1e= which is a play on the protocols name (cable).
+
+** Reliability
+The cable protocol can provide some reliability to packets, reliable
+packets cause more traffic and are slower but their correct reception
+and or order are guaranteed by the protocol.
+
+The reliability has 4 bits allocated to it but only 2 bits are
+actually used, the remaining 2 might be repurposed in the future
+i.e. are reserved.
+
+| 0b00       | 0b01     | 0b11             |
+|------------+----------+------------------|
+| unreliable | reliable | reliable ordered |
+
+*** Unreliable
+A unreliable packet is a packet that is not important and is fine to
+be handled out of order or not at all.
+
+*** Reliable
+A reliable packet is important to be handled but the order in which it
+is handled does not matter.
+
+*** Reliable ordered
+A reliable ordered packet needs to be handled in the correct order.
+
+If a reliable ordered packet is received the receiver will NAK all
+packets before the reliable ordered packet if the sequence is not
+continuous.  When a package before that was not a reliable ordered
+packet and it was NAK'd the sender will refrain from waiting for the
+rest to be received.  After any reliable ordered packet there will
+also be NAKs sent if there are any future gaps in the sequence until a
+not reliable ordered packet it received.  That means that reliable
+ordered packets are only ordered among themselves.
+
+** Data types
+It is not always clear how certain data types are to be interpreted,
+this section will list how data in packets is to be interpreted.
+Usually unless explicitly noted, everything is encoded in big-endian.
+
+*** String
+A string can contain a maximum of 255 bytes of UTF-8 encoded data.
+The string is prefixed with a unsigned byte which represents how many
+bytes of data follow it. The single byte =0x00= is a valid string, in
+this case it should be interpreted as a empty string.
+
+| length | UTF-8 payload     |
+|--------+-------------------|
+| 1B     | $length \times B$ |
+
+*** Boolean
+A boolean (or bool) is represented as a single byte, either =0x00= for
+=false= or =0x01= for true.  Any other value will trigger a encoding
+error, issuing a NAK if the packet is reliable.
+
+*** md5
+A md5 hash is simply sent as 16 single bytes starting from the
+biggest, i.e. big-endian.  A value of all zeros is interpreted as
+omitted.
+
+** Packets
+
+*** [[./TODO][ACK (0x00)]]
+- Data :: None.
+- Description :: This packet is sent by either the server or client in
+  order to *ack*​nowledge a certain packet with the same sequence as
+  this packet.  The reliability is the same as the packet that was
+  acknowledged.
+
+*** [[./TODO][NAK (0x01)]]
+- Data :: None.
+- Description :: This packet is the opposite of the ACK packet.  It
+  tells the recipient that a important packet was never delivered.  It
+  will only be sent if the recipient is currently in /reliable
+  ordered/ mode.
+
+  When a packet has encoding issues a NAK should be issued if it is a
+  reliable packet, a unreliable packet is OK to be dropped.
+
+*** [[./TODO][PlayerLoginPacket (0x02)]]
+- Data ::
+  | Field       | Type   |
+  |-------------+--------|
+  | Player name | String |
+- Description :: This packet is sent by the client to the server in
+  order to log-on, this will enter the players name into the database
+  and allow the client to join lobbies etc.
+
+** Typical packet sequence
+A typical exchange between client and server is depicted below:
+
+1. C→S: PlayerLoginPacket ::
+   reliablity: reliable ordered
+   seq: 0
+
+2. S→C: ACK ::
+   reliablity: reliable ordered
+   seq: 0
+
+3. to be continued.
