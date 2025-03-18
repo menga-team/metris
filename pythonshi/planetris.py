@@ -155,15 +155,15 @@ class Tetrimino:
             if self.direction == Direction.SOUTH:
                 # self.x = -len(self.tetromino[0]) // 2
                 self.x = 0
-                self.y = 15
+                self.y = 12
             if self.direction == Direction.WEST:
-                self.x = 15
+                self.x = 12
                 self.y = 0
             if self.direction == Direction.NORTH:
                 self.x = 0
                 self.y = -15
             if self.direction == Direction.EAST:
-                self.x = 15
+                self.x = -15
                 self.y = 0
 
         else:
@@ -232,7 +232,7 @@ class Grid:
         return key in self.data
 
     def __repr__(self):
-        return f"NestedList({self.data})"
+        return f"Grid({self.data})"
 
     def max(self):
         return max(max(max(abs(x), abs(y)) for x, y in self.keys()), 15)
@@ -263,7 +263,7 @@ class Planetris:
 
     def block_size(self):
         # return max(50, WIDTH/self.grid.max())
-        return WIDTH/31
+        return WIDTH/30
 
     # def replenish_piecepool(self):
     #     for pool in self.nextpiecepool:
@@ -354,6 +354,67 @@ class Planetris:
     #                                      ((pos[0] + x) * self.block_size(), (pos[1] + y) * self.block_size(),
     #                                       self.block_size(), self.block_size()))
 
+    def check_ring(self):
+        for i in range(1, self.grid.max()):
+            ring = True
+            p = self.grid[-i:-i-1, -i:i], self.grid[i:i+1, -i:i] , self.grid[-i:i, i:i+1] , self.grid[-i:i, -i:-i-1]
+            for s in range(-i, i+1):
+                if self.grid[i, s] == BLACK or self.grid[-i, s] == BLACK or self.grid[s, i] == BLACK or self.grid[s, -i] == BLACK:
+                    ring = False
+            if ring:
+                for s in range(-i, i+1):
+                    # self.grid[i-1, s] = self.grid[i, s]
+                    # self.grid[-i+1, s] = self.grid[-i, s]
+                    # self.grid[s, i-1] = self.grid[s, i]
+                    # self.grid[s, -i+1] = self.grid[s, -i]
+
+                    self.grid[i, s]= BLACK
+                    self.grid[-i, s]= BLACK
+                    self.grid[s, i]= BLACK
+                    self.grid[s, -i]= BLACK
+
+        # for i in range(1, self.grid.max()):
+        #     clear = True
+        #     for s in range(-i, i+1):
+        #         if self.grid[i, s] == BLACK:
+        #             clear = False
+        #             break
+        #     if clear:
+        #         for e in range(i, 15):
+        #             for d in range(-i, i+1):
+        #                 self.grid[e, d]= self.grid[e+1, d]
+
+            # clear = True
+            # for s in range(-i, i+1):
+            #     if self.grid[-i, s] == BLACK:
+            #         clear = False
+            #         break
+            # if clear:
+            #     for e in range(i, 15):
+            #         for d in range(-i, i+1):
+            #             self.grid[-e, d]= self.grid[-e-1, d]
+            #
+            # clear = True
+            # for s in range(-i, i+1):
+            #     if self.grid[s, i] == BLACK:
+            #         clear = False
+            #         break
+            # if clear:
+            #     for e in range(i, 15):
+            #         for d in range(-i, i+1):
+            #             self.grid[d, e]= self.grid[d, e+1]
+            #
+            # clear = True
+            # for s in range(-i, i+1):
+            #     if self.grid[s, -i] == BLACK:
+            #         clear = False
+            #         break
+            # if clear:
+            #     for e in range(i, 15):
+            #         for d in range(-i, i+1):
+            #             self.grid[d, -e]= self.grid[d, -e-1]
+
+
 
 
     def check_collision(self, dx=0, dy=0):
@@ -369,6 +430,8 @@ class Planetris:
         if not self.check_collision(dx, dy):
             self.current_piece.x += dx
             self.current_piece.y += dy
+        else:
+            self.place_piece()
 
     def place_piece(self):
         for y, row in enumerate(self.current_piece.tetromino):
@@ -399,11 +462,11 @@ class Planetris:
 
     def update(self):
         if self.current_piece.direction == Direction.SOUTH:
-            self.move_piece(0, 1)
+            self.move_piece(0, -1)
         if self.current_piece.direction == Direction.WEST:
             self.move_piece(-1, 0)
         if self.current_piece.direction == Direction.NORTH:
-            self.move_piece(0, -1)
+            self.move_piece(0, 1)
         if self.current_piece.direction == Direction.EAST:
             self.move_piece(-1, 0)
 
@@ -620,7 +683,7 @@ def main():
                 elif event.key == pygame.K_SPACE:
                     piece = game.current_piece
                     while game.current_piece == piece and game:
-                        game.move_piece(0, 1)
+                        game.update()
                 # elif event.key == pygame.K_p:
                 #     game.paused=True
                 #     game.solver.get_possible_placements()
@@ -638,6 +701,8 @@ def main():
 
             if not game.paused:
                 game.update()
+
+            game.check_ring()
         game.draw_grid(screen)
         # game.draw_placment_preview(screen)
         game.draw_piece(screen)
