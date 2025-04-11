@@ -1,16 +1,20 @@
+import math
 import threading
 import time
 from collections import Counter
 from math import sqrt
 from random import shuffle
+from statistics import median
+from threading import Thread
 
 import pygame
 import random
 
-from pygame import Color
+from pygame import Color, SurfaceType
 
 # Initialize pygame
 pygame.init()
+font = pygame.font.Font(None, 36)
 
 # Constants
 BLOCK_SIZE = 50
@@ -167,8 +171,29 @@ class Tetrimino:
 
 
 class Tetris:
-    def __init__(self):
-        self.grid = [[BLACK for _ in range(COLUMNS)] for _ in range(ROWS)]
+    def __init__(self, overlay):
+        self.grid = [[BLACK for x in range(COLUMNS)] for y in range(ROWS)]
+        # self.grid = [[(0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)],
+        #              [(0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)],
+        #              [(0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)],
+        #              [(0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)],
+        #              [(0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)],
+        #              [(0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)],
+        #              [(0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)],
+        #              [(0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)],
+        #              [(0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)],
+        #              [(0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)],
+        #              [(0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)],
+        #              [(0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)],
+        #              [(0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)],
+        #              [(0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)],
+        #              [(0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)],
+        #              [(0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)],
+        #              [(0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)],
+        #              [(0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)],
+        #              [(0, 0, 0), (255, 0, 0), (255, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)],
+        #              [(0, 0, 0), (255, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)]]
+        # self.grid = [[BLACK if y < 15 or x == y-10 else WHITE for x in range(COLUMNS)] for y in range(ROWS)]
         self.past_pieces = []
         self.current_piece = Tetrimino()
         self.running = True
@@ -177,6 +202,7 @@ class Tetris:
         self.last_update = 0
         self.key_pressed = False
         self.solver = Solver(self)
+        self.overlay: SurfaceType = overlay
 
     def replenish_piecepool(self):
         for pool in self.nextpiecepool:
@@ -208,11 +234,11 @@ class Tetris:
                                       BLOCK_SIZE, BLOCK_SIZE))
 
     def draw_paths(self, screen):
-        for i in self.solver.all_possible_places:
-            x = i[0]
-            y = i[1]
-            r = i[2]
-            pygame.draw.rect(screen, RED, ((x*BLOCK_SIZE + BLOCK_SIZE//5 + ((BLOCK_SIZE//5) * (r//2) *2), y*BLOCK_SIZE + BLOCK_SIZE//5 + ((BLOCK_SIZE//5) * (r%2) * 2)), (BLOCK_SIZE//5, BLOCK_SIZE//5)))
+        # for i in self.solver.all_possible_places:
+        #     x = i[0]
+        #     y = i[1]
+        #     r = i[2]
+        #     pygame.draw.rect(screen, RED, ((x*BLOCK_SIZE + BLOCK_SIZE//5 + ((BLOCK_SIZE//5) * (r//2) *2), y*BLOCK_SIZE + BLOCK_SIZE//5 + ((BLOCK_SIZE//5) * (r%2) * 2)), (BLOCK_SIZE//5, BLOCK_SIZE//5)))
 
         for i in self.solver.past_pos:
             x = i[0]
@@ -281,11 +307,9 @@ class Tetris:
             self.place_piece()
 
     def move_piece_abs(self, x, y, r):
-        if not self.check_collision(x, y):
-            self.current_piece.x = x
-            self.current_piece.y = y
-        elif y > 0:
-            self.place_piece()
+        self.current_piece.rotate(r)
+        self.current_piece.x = x
+        self.current_piece.y = y
 
     def place_piece(self):
         for y, row in enumerate(self.current_piece.tetromino):
@@ -296,7 +320,8 @@ class Tetris:
         self.current_piece = Tetrimino(shape_index=self.pop_next_piece())
         if self.check_collision():
             self.running = False  # Game Over
-        self.solver.get_possible_placements()
+        # self.solver.get_possible_placements()
+        self.score += 10
 
     def rotate(self):
         old_tetromino = self.current_piece.tetromino
@@ -311,7 +336,7 @@ class Tetris:
     def clear_lines(self):
         new_grid = [row for row in self.grid if BLACK in row]
         lines_cleared = ROWS - len(new_grid)
-        self.score += lines_cleared * 100
+        self.score += (2**lines_cleared) * 100
         self.grid = [[BLACK] * COLUMNS for _ in range(lines_cleared)] + new_grid
 
     def update(self):
@@ -325,15 +350,17 @@ def point_distance(x1, y1, z1, x2, y2, z2):
 class Solver:
 
     def __init__(self, game: Tetris):
-        self.thread_active = None
+        self.descending_thread: Thread = None
+        self.pos_finder_thread = None
+        self.thread_active = True
         self.placment_previeing = 0
         self.game = game
         self.possible_placings_pathfound = []
-        self.all_possible_places = []
+        self.height_threshold = 0
+        # self.all_possible_places = []
         self.past_pos = []
         self.piece_path = []
         self.best_pos = []
-        self.best_pos_score = -1
 
     def check_collision(self, dx=0, dy=0, piece=None):
         if piece is None:
@@ -355,11 +382,20 @@ class Solver:
         self.game.place_piece()
 
 
-    def calc_pos_score(self, pos, tetromino=None):
-        if tetromino is None:
-            tetromino = self.game.current_piece.copy()
+    def calc_pos_score(self, pos, piece=None):
+        if piece is None:
+            piece = self.game.current_piece.copy()
+        piece.rotate(pos[2])
+        grid = [i.copy() for i in self.game.grid]
+
+        for y, row in enumerate(piece.tetromino):
+            for x, cell in enumerate(row):
+                if cell:
+                    grid[pos[1] + y][pos[0] + x] = piece.color
+
+        # score = round(20*(1-math.e**(-0.3*(pos[1]-4))))
         score = pos[1]
-        for y, row in enumerate(tetromino.tetromino):
+        for y, row in enumerate(piece.tetromino):
             for x, cell in enumerate(row):
                 if cell:
                     for i in range(4):
@@ -377,56 +413,83 @@ class Solver:
                         if new_y < 0:
                             continue
                         if new_x < 0 or new_x >= COLUMNS or new_y >= ROWS:
-                            score += 0.5
+                            score += 0.6
                             continue
                         if self.game.grid[new_y][new_x] != BLACK:
                             score += 1
-        if score > self.best_pos_score:
-            self.best_pos = pos
+                            if i == 3:
+                                score +=2
+
+        self.game.overlay.fill((255, 0, 255))
+
+        rngx = ''.join([' ' if i.count(1) == 0 else 'p' for i in map(list, zip(*piece.tetromino))])
+        rngy = ''.join([' ' if i.count(1) == 0 else 'p' for i in piece.tetromino])
+
+
+        hanging_blocks = 0
+
+        for x in range(pos[0] + len(rngx.split('p')[0]) - 1, pos[0] + len(rngx.split('p')[0]) + len(rngx.strip()) + 1):
+            if x < 0 or x >= COLUMNS:
+                continue
+            game_grid_edge_reached = False
+            new_grid_edge_reached = False
+            for y in range(pos[1] + len(rngy.split('p')[0]) - 1, pos[1] + len(rngy.split('p')[0]) + len(rngy.strip()) + 1):
+                pygame.draw.rect(self.game.overlay, RED, (x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE), 2)
+                if y < 0 or y >= ROWS:
+                    continue
+                if not game_grid_edge_reached and new_grid_edge_reached:
+                    if grid[y][x] == BLACK:
+                        score -= 5
+                        # if hanging_blocks > 0:
+                        #     pass
+                if self.game.grid[y][x] != BLACK:
+                    game_grid_edge_reached = True
+
+                if grid[y][x] != BLACK:
+                    new_grid_edge_reached = True
+
         return score
 
-    def get_possible_placements(self):
+    def get_possible_placements(self, threaded=True):
 
         self.past_pos.clear()
         self.possible_placings_pathfound.clear()
-        self.all_possible_places.clear()
+        # self.all_possible_places.clear()
         self.placment_previeing = 0
         p = self.game.current_piece.copy()
+        # for r in range(len(p.shape)):
+        #     p.rotate(r)
+        #     for x in range(-2, COLUMNS+2):
+        #         for y in range(ROWS):
+        #             if not self.check_collision(x, y, piece=p) and self.check_collision(x, y+1, piece=p):
+        #                 self.all_possible_places.append([x, y, r])
 
-        p.x = 0
-        p.y = 0
-        for r in range(len(p.shape)):
-            p.rotate(r)
-            for x in range(-2, COLUMNS+2):
-                for y in range(ROWS):
-                    if not self.check_collision(x, y, piece=p) and self.check_collision(x, y+1, piece=p):
-                        self.all_possible_places.append([x, y, r])
+        self.height_threshold = ROWS
+        for x in range(COLUMNS):
+            for y in range(ROWS):
+                if y >= self.height_threshold:
+                    break
+                if self.game.grid[y][x] != BLACK:
+                    self.height_threshold = y
+                    break
+        self.height_threshold -= len(p.tetromino)
+        self.height_threshold = max(self.height_threshold, 0)
 
-        self.thread_active = False
-        time.sleep(0.1)
-        self.thread_active = True
-        threading.Thread(target=lambda : self.descend([p.x, p.y, p.rotation])).start()
+        if threaded:
+            # self.thread_active = False
+            # time.sleep(0.1)
+            # self.thread_active = True
+            self.descending_thread = threading.Thread(target=lambda : self.descend([p.x, self.height_threshold, p.rotation]))
+            self.descending_thread.start()
+        else:
+            self.descend([p.x, self.height_threshold, p.rotation])
 
     def descend(self, pos):
         if not self.thread_active:
             return
-        p = Tetrimino(self.game.current_piece.shape_index, *pos)
-        pos = [pos[0], pos[1], p.rotation]
-
-        if self.check_collision(piece=p):
-            return
-
-        if self.past_pos.count(pos) != 0:
-            return
-
-        self.past_pos.append(pos)
-
-        if self.check_collision(0, 1, piece=p) and self.possible_placings_pathfound.count(pos) <= 0:
-            self.possible_placings_pathfound.append(pos)
-            # self.calc_pos_score(pos)
-            # self.placment_previeing = self.possible_placings_pathfound.index(self.best_pos)
 
         # time.sleep(0.03)
+        p = Tetrimino(self.game.current_piece.shape_index, *pos)
         arglist = [[pos[0], pos[1], p.rotation + 1],
                    [pos[0], pos[1], p.rotation - 1],
                    [pos[0], pos[1] + 1, p.rotation],
@@ -436,20 +499,35 @@ class Solver:
         #     for i in range(len(p.shape)):
         #         arglist.append([pos[0], pos[1], i])
         random.shuffle(arglist)
-        for i in arglist:
+        for c in arglist:
+            p.x = c[0]
+            p.y = c[1]
+            p.rotate(c[2])
+            i = [c[0], c[1], p.rotation]
+
+            if self.past_pos.count(i) != 0:
+                continue
+
+            if self.check_collision(piece=p):
+                continue
+
+            self.past_pos.append(i)
+
+            if self.check_collision(0, 1, piece=p) and self.possible_placings_pathfound.count(i) <= 0:
+                self.possible_placings_pathfound.append(i)
+
             self.descend(i)
 
     def pos_pathfinder(self):
         goal = self.possible_placings_pathfound[self.placment_previeing]
 
-        threading.Thread(target=lambda: self.pos_pathfinder_thread(goal)).start()
+        self.pos_finder_thread = threading.Thread(target=lambda: self.pos_pathfinder_thread(goal))
+        self.pos_finder_thread.start()
 
     def ez_reachable(self, pos):
-        p = self.game.current_piece.copy()
-
-        for i in range(pos[1], 0, -1):
-            p.y = i
-            if self.check_collision(piece=p):
+        p = Tetrimino(shape_index=self.game.current_piece.shape_index, x=pos[0], y=pos[1], rotation=pos[2])
+        for i in range(pos[1]):
+            if self.check_collision(piece=p, dy=-i):
                 return False
         return True
 
@@ -457,9 +535,9 @@ class Solver:
         p = self.game.current_piece.copy()
         goal = [p.get_x_origin(), 0, 0]
 
-        self.thread_active = False
-        time.sleep(0.1)
-        self.thread_active = True
+        # self.thread_active = False
+        # time.sleep(0.1)
+        # self.thread_active = True
         # threading.Thread(target=lambda : descend([p.x, p.y, p.rotation])).start()
 
         queue = []
@@ -494,8 +572,8 @@ class Solver:
             queue.remove(l)
 
             self.piece_path = []
-            for i in queue:
-                self.piece_path.extend(i[1])
+            # for i in queue:
+            #     self.piece_path.extend(i[1])
 
             if pos == goal:
                 self.piece_path = log + [pos]
@@ -503,7 +581,7 @@ class Solver:
 
             if self.ez_reachable(pos):
                 self.piece_path = self.autocomplete_path_to_origin(log + [pos])
-                return
+                break
 
             t = [pos[0]+1, pos[1], pos[2]]
             if t in pos_pool and t not in log:
@@ -524,6 +602,7 @@ class Solver:
             t = [pos[0], pos[1], p.modulo_rotation(pos[2] - 1)]
             if t in pos_pool and t not in log:
                 append(queue, [t, log + [pos], point_distance(*t, *goal), f + 1])
+        self.piece_path.reverse()
 
 
     def autocomplete_path_to_origin(self, path: list):
@@ -549,15 +628,44 @@ class Solver:
                 path.append([last_pos[0], last_pos[1], 0])
         return path
 
+    def autosolve(self):
+        while True:
+            # time.sleep(1)
+            # self.descending_thread.join()
+            self.get_possible_placements(threaded=False)
+            if len(self.possible_placings_pathfound) == 0:
+                self.game.place_piece()
+                return
+            best_pos = self.possible_placings_pathfound[0]
+            best_score = 0
+            scores = []
+            for n, i in enumerate(self.possible_placings_pathfound):
+                score = self.calc_pos_score(i)
+                scores.append([score, i])
+                if score > best_score:
+                    best_score = score
+                    best_pos = i
+                    self.placment_previeing = n
 
+            # self.calc_pos_score(best_pos)
+            #
+            # self.pos_pathfinder_thread(best_pos)
+            # for pos in self.piece_path:
+            #     time.sleep(0.2)
+            #     self.game.move_piece_abs(*pos)
+            self.game.move_piece_abs(*best_pos)
+            self.game.place_piece()
 
 # Game Loop
 def main():
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    overlay = pygame.surface.Surface((WIDTH, HEIGHT))
+    overlay.set_colorkey((255,0,255))
+    overlay.fill((255,0,255))
     clock = pygame.time.Clock()
-    game = Tetris()
-    font = pygame.font.Font(None, 36)
+    game = Tetris(overlay)
 
+    Thread(target=game.solver.autosolve).start()
     while game.running:
         screen.fill(BLACK)
         for event in pygame.event.get():
@@ -592,6 +700,8 @@ def main():
                     game.solver.pos_pathfinder()
                 elif event.key == pygame.K_i:
                     game.solver.sort_by_best_path()
+                elif event.key == pygame.K_k:
+                    Thread(target=game.solver.autosolve).start()
 
 
         if game.last_update + 1 < time.time():
@@ -600,6 +710,7 @@ def main():
 
             if not game.paused:
                 game.update()
+
         game.draw_grid(screen)
         game.draw_placment_preview(screen)
         game.draw_piece(screen)
@@ -611,14 +722,24 @@ def main():
         else:
             pygame.draw.polygon(screen, WHITE, ((10, 10), (30, 20), (10, 30)))
 
-        to_render = f"Score: {game.score}  {game.solver.placment_previeing}/{len(game.solver.possible_placings_pathfound)}"
-        score_text = font.render(to_render, True, WHITE)
-        screen.blit(score_text, (50, 10))
+        # to_render = f"Score: {game.score}  {game.solver.placment_previeing}/{len(game.solver.possible_placings_pathfound)}"
+        # score_text = font.render(to_render, True, WHITE)
+        # screen.blit(score_text, (50, 10))
 
         pygame.display.flip()
 
+
     pygame.quit()
 
+    score_list.append(game.score)
+    print(f"[{time.time()}]score: {game.score}")
 
 if __name__ == "__main__":
-    main()
+    # main()
+
+
+    print('\n')
+    score_list = []
+    for i in range(10):
+        main()
+    print(f"max: {max(score_list)}, min: {min(score_list)}, avrg: {sum(score_list) / len(score_list)}, median: {median(score_list)}")
