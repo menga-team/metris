@@ -33,7 +33,7 @@ The reliability has 4 bits allocated to it but only 2 bits are
 actually used, the remaining 2 might be repurposed in the future
 i.e. are reserved.
 
-| 0b00       | 0b01     | 0b11             |
+| $00_2$     | $01_2$   | $11_2$           |
 |------------+----------+------------------|
 | unreliable | reliable | reliable ordered |
 
@@ -68,9 +68,9 @@ The string is prefixed with a unsigned byte which represents how many
 bytes of data follow it. The single byte =0x00= is a valid string, in
 this case it should be interpreted as a empty string.
 
-| length | UTF-8 payload     |
-|--------+-------------------|
-| 1B     | $length \times B$ |
+| length | UTF-8 payload       |
+|--------+---------------------|
+| 1B     | ${length} \times B$ |
 
 *** Boolean
 A boolean (or bool) is represented as a single byte, either =0x00= for
@@ -103,9 +103,9 @@ omitted.
 
 *** [[./TODO][PlayerLoginPacket (0x02)]]
 - Data ::
-  | Field       | Type   |
-  |-------------+--------|
-  | Player name | String |
+  | Index | Field name  | Type   |
+  |-------+-------------+--------|
+  |     0 | Player name | String |
 - Description :: This packet is sent by the client to the server in
   order to log-on, this will enter the players name into the database
   and allow the client to join lobbies etc.
@@ -113,12 +113,12 @@ omitted.
 ** Typical packet sequence
 A typical exchange between client and server is depicted below:
 
-1. C→S: PlayerLoginPacket ::
-   reliablity: reliable ordered
-   seq: 0
+1. C→S: PlayerLoginPacket
+   - Reliablity :: reliable ordered
+   - Sequence :: 0
 
-2. S→C: ACK ::
-   reliablity: reliable ordered
-   seq: 0
+2. S→C: ACK
+   - Reliablity :: reliable ordered
+   - Sequence :: 0
 
-3. to be continued.
+3. /to be continued./

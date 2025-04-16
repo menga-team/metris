@@ -8,9 +8,24 @@ public enum PacketReliability {
     RELIABLE(1),
     RELIABLE_ORDERED(2);
 
-    private final int id;
+    private final byte id;
 
     PacketReliability(int id) {
-        this.id = id;
+        this.id = (byte) id;
+    }
+
+    public static PacketReliability fromId(int id) throws PacketDecodeException {
+        switch (id) {
+            case 0 -> {
+                return UNRELIABLE;
+            }
+            case 1 -> {
+                return RELIABLE;
+            }
+            case 2 -> {
+                return RELIABLE_ORDERED;
+            }
+            default -> throw new PacketDecodeException("Invalid reliability.");
+        }
     }
 }

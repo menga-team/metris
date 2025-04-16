@@ -1,5 +1,7 @@
 package dev.menga.metris;
 
+import dev.menga.metris.cable.CableProtocol;
+
 public class MetrisServer {
 
     private int port;
@@ -13,6 +15,8 @@ public class MetrisServer {
     }
 
     public static void main(String[] args) throws Exception {
+        CableProtocol.registerPackets("dev.menga.metris.cable.packet");
+
         int port = 45561;
         if (args.length > 0) {
             port = Integer.parseInt(args[0]);
