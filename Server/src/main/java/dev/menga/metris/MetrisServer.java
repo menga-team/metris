@@ -15,7 +15,8 @@ public class MetrisServer {
     }
 
     public static void main(String[] args) throws Exception {
-        CableProtocol.registerPackets("dev.menga.metris.cable.packet");
+        int count = CableProtocol.registerPackets("dev.menga.metris.cable.packet");
+        Metris.getLogger().info("Registered {} packets!", count);
 
         int port = 45561;
         if (args.length > 0) {
