@@ -25,6 +25,10 @@ public class CableString implements NetSerializable {
         this.data = data;
     }
 
+    public String toString() {
+        return new String(this.getData(), StandardCharsets.UTF_8);
+    }
+
     @Override
     public void encode(ByteBuf buf) {
         buf.writeByte(this.getData().length);

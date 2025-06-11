@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class CableProtocol {
 
-    final static Map<Byte, Class<? extends CablePacket>> PACKET_IDS = new HashMap<>();
+    public final static Map<Byte, Class<? extends CablePacket>> PACKET_IDS = new HashMap<>();
 
     public static int registerPackets(String packagePath) throws IOException {
         final ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -23,7 +23,7 @@ public class CableProtocol {
                     Object instance = clazz.getConstructor(InetSocketAddress.class).newInstance(dummy);
                     if (instance instanceof CablePacket p) {
                         PACKET_IDS.put(p.id(), p.getClass());
-                        Metris.getLogger().info("Registered packet {} (id: {})", clazz.getName(), p.id());
+                        Metris.getLogger().info("Registered packet {} ({})", clazz.getName(), p.id());
                         count++;
                     }
                 } catch (Exception e) {
