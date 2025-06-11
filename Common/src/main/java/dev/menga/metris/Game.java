@@ -17,6 +17,7 @@ public abstract class Game {
     public abstract void refillBags();
 
     public Tetromino pollNextTetromino() {
+        if (bagA == null) bagA = new LinkedList<>();
         Tetromino poll = bagA.poll();
         if (poll != null) {
             return poll;
