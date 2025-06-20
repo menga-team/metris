@@ -26,7 +26,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        this.metris = new RenderableGame(this.game.resources, Vec2i.of(0, 0));
+        this.metris = new RenderableGame(this.game.resources, Vec2i.of(0, 0), Vec2i.of(386, 160));
         this.inputHandler = new InputHandler(this.metris);
         this.stage = new Stage(this.viewport, this.game.batch);
         Gdx.input.setInputProcessor(this.inputHandler);
