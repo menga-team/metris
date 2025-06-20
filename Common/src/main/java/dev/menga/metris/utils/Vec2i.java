@@ -13,6 +13,15 @@ public class Vec2i {
         return new Vec2i(x, y);
     }
 
+    public void addMut(Vec2i rhs) {
+        this.x += rhs.x;
+        this.y += rhs.y;
+    }
+
+    public Vec2i add(Vec2i rhs) {
+        return Vec2i.of(rhs.getX() + this.getX(), rhs.getY() + this.getY());
+    }
+
     public Vec2i(int x, int y) {
         this.x = x;
         this.y = y;

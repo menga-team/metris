@@ -65,6 +65,17 @@ public enum Tetromino {
         this.color = color;
     }
 
+    // TODO: Any better way to handle rotation?
+    public void rotateCW() {
+        final Rotation[] rotationTranslation = { Rotation.DEG90, Rotation.DEG180, Rotation.DEG270, Rotation.DEG0 };
+        this.setRotation(rotationTranslation[this.getRotation().getIndex()]);
+    }
+
+    public void rotateCCW() {
+        final Rotation[] rotationTranslation = { Rotation.DEG270, Rotation.DEG0, Rotation.DEG90, Rotation.DEG180 };
+        this.setRotation(rotationTranslation[this.getRotation().getIndex()]);
+    }
+
     public Shape getShape() {
         return this.getShapes()[this.getRotation().getIndex()];
     }

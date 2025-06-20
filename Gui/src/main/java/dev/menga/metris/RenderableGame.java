@@ -18,7 +18,6 @@ public class RenderableGame extends Game {
     // TODO: RenderConfig class ?
     public RenderableGame(Resources resources, Vec2i gridOff, Vec2i nextOff) {
         super();
-        this.field.colors[19][0] = Color.AQUA;
         this.resources = resources;
         this.gridOff = gridOff;
         this.nextOff = nextOff;
@@ -29,13 +28,15 @@ public class RenderableGame extends Game {
         for (int y = 0; y < Field.MAX_VISIBLE_HEIGHT; ++y) {
             for (int x = 0; x < Field.MAX_WIDTH; ++x) {
                 Color color = this.field.getColors()[y][x];
+                // TODO: Maybe rething visible sprites and keep the void
+                // a normal sprite as any other color/garbage?
                 batch.draw(this.resources.getUnit(),
-                        this.gridOff.getX() + (FIELD_RENDER_UNIT * x),
-                        this.gridOff.getY() + (FIELD_RENDER_UNIT * y));
+                           this.gridOff.getX() + (FIELD_RENDER_UNIT * x),
+                           this.gridOff.getY() + (FIELD_RENDER_UNIT * y));
                 if (color.isVisible()) {
                     batch.draw(this.resources.getColor(color),
-                            this.gridOff.getX() + (FIELD_RENDER_UNIT * x),
-                            this.gridOff.getY() + (FIELD_RENDER_UNIT * y));
+                               this.gridOff.getX() + (FIELD_RENDER_UNIT * x),
+                               this.gridOff.getY() + (FIELD_RENDER_UNIT * y));
                 }
             }
         }
@@ -44,14 +45,15 @@ public class RenderableGame extends Game {
         for (int i = 0; i < NEXT_TETROMINOS; ++i) {
             for (Vec2i tile : preview[i].getShape().getTiles()) {
                 batch.draw(this.resources.getColor(preview[i].getColor()),
-                        this.nextOff.getX() + (FIELD_RENDER_UNIT * tile.getX()),
-                        this.nextOff.getY() + i * FIELD_RENDER_UNIT * 4 + (FIELD_RENDER_UNIT * tile.getY()));
+                           this.nextOff.getX() + (FIELD_RENDER_UNIT * tile.getX()),
+                           this.nextOff.getY() + i * FIELD_RENDER_UNIT * 4 + (FIELD_RENDER_UNIT * tile.getY()));
             }
         }
     }
 
     public void update(float delta) {
-
+        long deltaInMs = Math.round(delta * 1000f);
+        this.update(deltaInMs);
     }
 
     @Override
