@@ -49,6 +49,8 @@ public abstract class Game {
     }
 
     public Game() {
+        this.refillBags();
+        this.refillBags();
         this.currentTetromino = this.pollNextTetromino();
     }
 }

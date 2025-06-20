@@ -1,5 +1,6 @@
 package dev.menga.metris;
 
+import dev.menga.metris.utils.Vec2i;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -86,21 +87,6 @@ enum Rotation {
 
     Rotation(int index) {
         this.index = index;
-    }
-}
-
-@Getter @Setter
-class Vec2i {
-    public int x;
-    public int y;
-
-    public static Vec2i of(int x, int y) {
-        return new Vec2i(x, y);
-    }
-
-    public Vec2i(int x, int y) {
-        this.x = x;
-        this.y = y;
     }
 }
 
