@@ -14,33 +14,30 @@ public class RenderableGame extends Game {
     static final int NEXT_TETROMINOS = 4;
 
     static final int[] TEXTURE_LOOKUP = {
-            1, 5, 1, 5, 7, 13, 7, 9, 1, 5, 1, 5, 7, 13, 7, 9, 4, 3, 4, 3, 12, 31, 12, 24, 4, 3, 4, 3, 8, 25, 8, 19, 1,
-            5, 1, 5, 7, 13, 7, 9, 1, 5, 1, 5, 7, 13, 7, 9, 4, 3, 4, 3, 12, 31, 12, 24, 4, 3, 4, 3, 8, 25, 8, 19, 6,
-            15, 6, 15, 2, 29, 2, 23, 6, 15, 6, 15, 2, 29, 2, 23, 14, 30, 14, 30, 28, 46, 28, 44, 14, 30, 14, 30, 20,
-            45, 20, 39, 6, 15, 6, 15, 2, 29, 2, 23, 6, 15, 6, 15, 2, 29, 2, 23, 10, 27, 10, 27, 21, 43, 21, 41, 10,
-            27, 10, 27, 16, 37, 16, 35, 1, 5, 1, 5, 7, 13, 7, 9, 1, 5, 1, 5, 7, 13, 7, 9, 4, 3, 4, 3, 12, 31, 12, 24,
-            4, 3, 4, 3, 8, 25, 8, 19, 1, 5, 1, 5, 7, 13, 7, 9, 1, 5, 1, 5, 7, 13, 7, 9, 4, 3, 4, 3, 12, 31, 12, 24,
-            4, 3, 4, 3, 8, 25, 8, 19, 6, 11, 6, 11, 2, 22, 2, 17, 6, 11, 6, 11, 2, 22, 2, 17, 14, 26, 14, 26, 28, 42,
-            28, 36, 14, 26, 14, 26, 20, 40, 20, 34, 6, 11, 6, 11, 2, 22, 2, 17, 6, 11, 6, 11, 2, 22, 2, 17, 10, 18,
-            10, 18, 21, 38, 21, 32, 10, 18, 10, 18, 16, 33, 16, 0};
+        1, 5, 1, 5, 7, 13, 7, 9, 1, 5, 1, 5, 7, 13, 7, 9, 4, 3, 4, 3, 12, 31, 12, 24, 4, 3, 4, 3, 8, 25, 8, 19, 1,
+        5, 1, 5, 7, 13, 7, 9, 1, 5, 1, 5, 7, 13, 7, 9, 4, 3, 4, 3, 12, 31, 12, 24, 4, 3, 4, 3, 8, 25, 8, 19, 6,
+        15, 6, 15, 2, 29, 2, 23, 6, 15, 6, 15, 2, 29, 2, 23, 14, 30, 14, 30, 28, 46, 28, 44, 14, 30, 14, 30, 20,
+        45, 20, 39, 6, 15, 6, 15, 2, 29, 2, 23, 6, 15, 6, 15, 2, 29, 2, 23, 10, 27, 10, 27, 21, 43, 21, 41, 10,
+        27, 10, 27, 16, 37, 16, 35, 1, 5, 1, 5, 7, 13, 7, 9, 1, 5, 1, 5, 7, 13, 7, 9, 4, 3, 4, 3, 12, 31, 12, 24,
+        4, 3, 4, 3, 8, 25, 8, 19, 1, 5, 1, 5, 7, 13, 7, 9, 1, 5, 1, 5, 7, 13, 7, 9, 4, 3, 4, 3, 12, 31, 12, 24,
+        4, 3, 4, 3, 8, 25, 8, 19, 6, 11, 6, 11, 2, 22, 2, 17, 6, 11, 6, 11, 2, 22, 2, 17, 14, 26, 14, 26, 28, 42,
+        28, 36, 14, 26, 14, 26, 20, 40, 20, 34, 6, 11, 6, 11, 2, 22, 2, 17, 6, 11, 6, 11, 2, 22, 2, 17, 10, 18,
+        10, 18, 21, 38, 21, 32, 10, 18, 10, 18, 16, 33, 16, 0
+    };
 
-/*
-        block texturing process
-        +------------+-------------------------------+-------------------+-----------------------+-------------------+
-        |neighbors   |   bit-array                   |              int  |   lookup table        |   texture index   |
-        |            |                               |                   |                       |                   |
-        |0 1 1       |                               |                   |                       |                   |
-        |0 x 0       |   [0, 1, 1, 0, 1, 1, 1, 0]    |   110             |   array[110]          |   2               |
-        |1 1 1       |                               |                   |                       |                   |
-        +------------+-------------------------------+-------------------+-----------------------+-------------------+
-*/
+    // block texturing process
+    // +------------+-------------------------------+---------+-----------------------+-------------------+
+    // |neighbors   |   bit-array                   |  int    |   lookup table        |   texture index   |
+    // |            |                               |         |                       |                   |
+    // |0 1 1       |                               |         |                       |                   |
+    // |0 x 0       |   [0, 1, 1, 0, 1, 1, 1, 0]    |   110   |   array[110]          |   2               |
+    // |1 1 1       |                               |         |                       |                   |
+    // +------------+-------------------------------+---------+-----------------------+-------------------+
 
     private Resources resources;
     private final Vec2i gridOff;
     private final Vec2i nextOff;
     private final Vec2i heldOff;
-    @Setter
-    private Color[][] randomFieldColors;
 
     // TODO: RenderConfig class ?
     public RenderableGame(Resources resources, Vec2i gridOff, Vec2i nextOff, Vec2i heldOff) {
@@ -139,14 +136,6 @@ public class RenderableGame extends Game {
         if (ghost) {
             texture = this.resources.getGhostColor(toRender.getColor());
         } else {
-
-
-
-
-
-
-
-
             texture = this.resources.getTile(toRender.getColor(), 0);
         }
 
@@ -161,21 +150,7 @@ public class RenderableGame extends Game {
 
     @Override
     public void refillBags() {
-        // TODO: Online
         this.bagA = this.bagB;
-        List<Tetromino> temp = Arrays.asList(Tetromino.values());
-        Collections.shuffle(temp);
-        this.bagB = new LinkedList<>(temp);
-    }
-
-    public void fillField() {
-        // Fill the fields with random colors generated in show
-        if (this.randomFieldColors != null) {
-            for (int y = 0; y < Field.MAX_VISIBLE_HEIGHT; ++y) {
-                for (int x = 0; x < Field.MAX_WIDTH; ++x) {
-                    this.field.getColors()[y][x] = randomFieldColors[y][x];
-                }
-            }
-        }
+        this.bagB = new LinkedList<>(Tetromino.randomBag());
     }
 }

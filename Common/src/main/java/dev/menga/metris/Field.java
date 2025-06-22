@@ -30,8 +30,8 @@ public class Field {
 
     public void rasterizeTetromino(Tetromino tet, Vec2i pos) {
         Vec2i[] tiles = tet.getShape().getTiles();
-        for (int i = 0; i < tiles.length; ++i) {
-            this.setAt(pos.add(tiles[i]), tet.getColor());
+        for (Vec2i tile : tiles) {
+            this.setAt(pos.add(tile), tet.getColor());
         }
     }
 

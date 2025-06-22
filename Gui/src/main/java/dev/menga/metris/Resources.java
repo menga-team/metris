@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 import lombok.Getter;
 
+// TODO: Cleanup
 public class Resources implements Disposable {
 
     private final AssetManager assetManager = new AssetManager();
@@ -18,9 +19,8 @@ public class Resources implements Disposable {
     @Getter
     final private TextureRegion unit;
     final private TextureRegion[] colorTextures;
-    final private TextureRegion[] tileTextures;
-
     final private TextureRegion[] ghostColorTextures;
+    final private TextureRegion[] tileTextures;
 
     Resources() {
         this.assetManager.load("textures.atlas", TextureAtlas.class);

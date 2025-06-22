@@ -12,13 +12,13 @@ public abstract class Game {
 
     // The amount of `elapsed' (milliseconds) that needs to pass for the
     // gravity to pull the current tetromino 1 block.
-    long gravityStrengh = 1000;
+    long gravityStrength = 1000;
 
     @Getter
     boolean canExchangeHeld = true;
 
     @Getter
-    boolean gameOver = false;
+    boolean isGameOver = false;
 
     @Getter
     Vec2i position;
@@ -29,12 +29,10 @@ public abstract class Game {
     @Getter
     Tetromino holdingTetromino = null;
 
-    // TODO: Custom queue impl?
     Queue<Tetromino> bagA = null;
     Queue<Tetromino> bagB = null;
 
     long elapsed = 0;
-    // TODO: Maybe create Timer classes?
     long gravityTimer = 0;
 
     /**
@@ -78,9 +76,10 @@ public abstract class Game {
 
     public Vec2i getSpawnPosition() {
         Vec2i spawnPos = new Vec2i(4, 18);
-//        if (!this.testPlacement(spawnPos)) {
-//            spawnPos.addMut(0, 1);
-//        }
+        // FIXME: Why is this commented?
+        // if (!this.testPlacement(spawnPos)) {
+        //     spawnPos.addMut(0, 1);
+        // }
         return spawnPos;
     }
 
@@ -92,7 +91,8 @@ public abstract class Game {
         Vec2i[] tiles = tet.getShape().getTiles();
         for (int i = 0; i < tiles.length; ++i) {
             Vec2i testPos = coords.add(tiles[i]);
-            if (!(testPos.getY() >= 0 && testPos.getY() < Field.MAX_HEIGHT && testPos.getX() >= 0 && testPos.getX() < Field.MAX_WIDTH)) {
+            if (!(testPos.getY() >= 0 && testPos.getY() < Field.MAX_HEIGHT &&
+                  testPos.getX() >= 0 && testPos.getX() < Field.MAX_WIDTH)) {
                 return false;
             }
             if (this.getField().getAt(testPos).isVisible()) {
@@ -113,7 +113,7 @@ public abstract class Game {
     }
 
     public boolean move(Vec2i offset) {
-        if (this.gameOver) {
+        if (this.isGameOver()) {
             return false;
         }
 
@@ -145,14 +145,14 @@ public abstract class Game {
         this.currentTetromino = this.pollNextTetromino();
         this.position = this.getSpawnPosition();
         if (!this.testPlacement(this.currentTetromino, this.position)) {
-            this.gameOver = true;
+            this.isGameOver = true;
             return;
         }
         this.gravityTimer = 0;
     }
 
     public void hardDrop() {
-        if (this.gameOver) {
+        if (this.isGameOver()) {
             return;
         }
 
@@ -167,15 +167,15 @@ public abstract class Game {
     public void place(Tetromino tet, Vec2i pos) {
         this.field.rasterizeTetromino(tet, pos);
 
-        if (!this.gameOver) {
+        if (!this.isGameOver()) {
             this.nextTetromino();
         }
     }
 
     public void place() {
         this.place(this.getCurrentTetromino(), this.getPosition());
-        canExchangeHeld = true;
-        clearLines();
+        this.canExchangeHeld = true;
+        this.clearLines();
     }
 
     public void clearLines() {
@@ -187,25 +187,25 @@ public abstract class Game {
     }
 
     public boolean rotate(Rotation rot) {
-        if (this.gameOver) {
+        if (this.isGameOver()) {
             return false;
         }
 
         Vec2i[][] offsetData;
         Rotation currentRot = this.getCurrentTetromino().getRotation();
-        switch (this.getCurrentTetromino()) {
-            case Tetromino.I:
-                offsetData = Tetromino.OFFSET_DATA_I;
+        switch (this.getCurrentTetromino().getType()) {
+            case TetrominoType.I:
+                offsetData = TetrominoType.OFFSET_DATA_I;
                 break;
-            case Tetromino.J:
-            case Tetromino.L:
-            case Tetromino.S:
-            case Tetromino.T:
-            case Tetromino.Z:
-                offsetData = Tetromino.OFFSET_DATA_JLSTZ;
+            case TetrominoType.J:
+            case TetrominoType.L:
+            case TetrominoType.S:
+            case TetrominoType.T:
+            case TetrominoType.Z:
+                offsetData = TetrominoType.OFFSET_DATA_JLSTZ;
                 break;
-            case Tetromino.O:
-                Vec2i kick = Tetromino.OFFSET_DATA_O[currentRot.getIndex()].sub(Tetromino.OFFSET_DATA_O[rot.getIndex()]);
+            case TetrominoType.O:
+                Vec2i kick = TetrominoType.OFFSET_DATA_O[currentRot.getIndex()].sub(TetrominoType.OFFSET_DATA_O[rot.getIndex()]);
                 this.position.addMut(kick);
                 this.currentTetromino.setRotation(rot);
                 return true;
@@ -214,7 +214,13 @@ public abstract class Game {
         }
         this.currentTetromino.setRotation(rot);
 
-        Vec2i[] tests = {offsetData[currentRot.getIndex()][0].sub(offsetData[rot.getIndex()][0]), offsetData[currentRot.getIndex()][1].sub(offsetData[rot.getIndex()][1]), offsetData[currentRot.getIndex()][2].sub(offsetData[rot.getIndex()][2]), offsetData[currentRot.getIndex()][3].sub(offsetData[rot.getIndex()][3]), offsetData[currentRot.getIndex()][4].sub(offsetData[rot.getIndex()][4]),};
+        Vec2i[] tests = {
+            offsetData[currentRot.getIndex()][0].sub(offsetData[rot.getIndex()][0]),
+            offsetData[currentRot.getIndex()][1].sub(offsetData[rot.getIndex()][1]),
+            offsetData[currentRot.getIndex()][2].sub(offsetData[rot.getIndex()][2]),
+            offsetData[currentRot.getIndex()][3].sub(offsetData[rot.getIndex()][3]),
+            offsetData[currentRot.getIndex()][4].sub(offsetData[rot.getIndex()][4]),
+        };
 
         int kick = 0;
         boolean fits = false;
@@ -227,10 +233,11 @@ public abstract class Game {
 
         if (fits) {
             this.position.addMut(tests[kick]);
-        } else {
-            this.currentTetromino.setRotation(currentRot);
+            return true;
         }
-        return fits;
+
+        this.currentTetromino.setRotation(currentRot);
+        return false;
     }
 
     public boolean rotateCW() {
@@ -241,18 +248,16 @@ public abstract class Game {
         return this.rotate(this.getCurrentTetromino().getRotation().previous());
     }
 
-    // TODO: Right now delta gets passed as milliseconds, investigate if
-    // that is OK.
     public void tick(long delta) {
-        if (this.gameOver) {
+        if (this.isGameOver()) {
             return;
         }
 
         this.elapsed += delta;
         this.gravityTimer += delta;
 
-        if (this.gravityTimer >= this.gravityStrengh) {
-            this.gravityTimer -= this.gravityStrengh;
+        if (this.gravityTimer >= this.gravityStrength) {
+            this.gravityTimer -= this.gravityStrength;
             this.moveDown();
         }
     }
@@ -265,7 +270,7 @@ public abstract class Game {
     }
 
     public void holdPiece() {
-        if (this.gameOver) {
+        if (this.isGameOver()) {
             return;
         }
 
@@ -281,7 +286,7 @@ public abstract class Game {
             }
             this.canExchangeHeld = false;
         } else {
-            Metris.getLogger().warn("Cannot exchange held piece right now.");
+            Metris.getLogger().debug("Cannot exchange held piece right now.");
         }
     }
 }

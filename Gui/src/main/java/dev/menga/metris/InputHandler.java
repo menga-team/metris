@@ -13,8 +13,8 @@ public class InputHandler implements InputProcessor {
 
     @Getter
     private Game game;
-    private Map<Integer, Integer> held;
-    private Map<Integer, Integer> lastTrigger;
+    private final Map<Integer, Integer> held;
+    private final Map<Integer, Integer> lastTrigger;
 
     public InputHandler(Game game) {
         this.held = new HashMap<Integer, Integer>();

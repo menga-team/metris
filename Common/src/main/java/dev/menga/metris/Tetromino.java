@@ -4,10 +4,37 @@ import dev.menga.metris.utils.Vec2i;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+// Tetromino needs to be a instantiated class because we don't want to mix
+// rotations, as there is only 1 instance for any given Enum.  Maybe also
+// instantiate color for use in mini-games?
+
+@Getter
+public class Tetromino {
+    private final TetrominoType type;
+    @Setter
+    private Rotation rotation;
+
+    public Tetromino(TetrominoType type) {
+        this.type = type;
+        this.rotation = Rotation.DEG0;
+    }
+
+    public Shape getShape() {
+        return this.getType().getShapes()[this.getRotation().getIndex()];
+    }
+
+    public Color getColor() {
+        return this.getType().getColor();
+    }
+
+    public static List<Tetromino> randomBag() {
+        return TetrominoType.getRandomValues().stream().map(Tetromino::new).toList();
+    }
+}
 
 /* 0,0 is the center of every piece.  Every specified coordinate will
  * be filled with one tile.  4 Coordinates make up 1 tetromino.
@@ -32,7 +59,7 @@ import java.util.List;
  */
 
 @Getter
-public enum Tetromino {
+enum TetrominoType {
     I(new Shape[] {
           Shape.quad(Vec2i.of(-1, 0), Vec2i.of(0, 0), Vec2i.of(1, 0), Vec2i.of(2, 0)),    // 0°
           Shape.quad(Vec2i.of(0, 1), Vec2i.of(0, 0), Vec2i.of(0, -1), Vec2i.of(0, -2)),   // 90°
@@ -101,28 +128,13 @@ public enum Tetromino {
     private final Shape[] shapes;
     private final Color color;
 
-    @Setter
-    private Rotation rotation = Rotation.DEG0;
-
-    Tetromino(Shape[] shapes, Color color) {
+    TetrominoType(Shape[] shapes, Color color) {
         this.shapes = shapes;
         this.color = color;
     }
 
-    public void rotateCW() {
-        this.setRotation(this.getRotation().next());
-    }
-
-    public void rotateCCW() {
-        this.setRotation(this.getRotation().previous());
-    }
-
-    public Shape getShape() {
-        return this.getShapes()[this.getRotation().getIndex()];
-    }
-
-    public static List<Tetromino> getRandomValues() {
-        List<Tetromino> list =  Arrays.asList(Tetromino.values());
+    public static List<TetrominoType> getRandomValues() {
+        List<TetrominoType> list = Arrays.asList(TetrominoType.values());
         Collections.shuffle(list);
         return list;
     }
@@ -137,7 +149,6 @@ enum Rotation {
     @Getter
     private final int index;
 
-    // TODO: Any better way to handle rotation?
     public Rotation next() {
         final Rotation[] rotationTranslation = { DEG90, DEG180, DEG270, DEG0 };
         return rotationTranslation[this.getIndex()];
@@ -150,18 +161,5 @@ enum Rotation {
 
     Rotation(int index) {
         this.index = index;
-    }
-}
-
-@Getter @Setter
-class Shape {
-    private Vec2i[] tiles;
-
-    public Shape(Vec2i[] tiles) {
-        this.tiles = tiles;
-    }
-
-    public static Shape quad(Vec2i a, Vec2i b, Vec2i c, Vec2i d) {
-        return new Shape(new Vec2i[]{a, b, c, d});
     }
 }

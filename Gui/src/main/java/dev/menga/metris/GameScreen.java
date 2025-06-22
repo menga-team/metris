@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import dev.menga.metris.utils.Vec2i;
@@ -28,7 +30,6 @@ public class GameScreen implements Screen {
     private InputHandler inputHandler;
     private RenderableGame metris;
     private Stage stage;
-    private com.badlogic.gdx.scenes.scene2d.ui.Label gameOverLabel;
     private final Color[][] randomFieldColors = new Color[Field.MAX_VISIBLE_HEIGHT][Field.MAX_WIDTH];
 
     @Override
@@ -43,10 +44,9 @@ public class GameScreen implements Screen {
         Color[] visibleColors = Arrays.stream(Color.values()).filter(c -> c.getId() >= 2).toArray(Color[]::new);
         for (int y = 0; y < Field.MAX_VISIBLE_HEIGHT; ++y) {
             for (int x = 0; x < Field.MAX_WIDTH; ++x) {
-                randomFieldColors[y][x] = visibleColors[rand.nextInt(visibleColors.length)];
+                this.randomFieldColors[y][x] = visibleColors[rand.nextInt(visibleColors.length)];
             }
         }
-        this.metris.setRandomFieldColors(randomFieldColors);
     }
 
     @Override
@@ -103,9 +103,10 @@ public class GameScreen implements Screen {
 
     public void gameOver() {
         // show a game over text on the existing screen
-        com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle labelStyle = new com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle(this.game.resources.getDefaultFont(), com.badlogic.gdx.graphics.Color.RED);
+        LabelStyle labelStyle = new LabelStyle(this.game.resources.getDefaultFont(),
+                                               com.badlogic.gdx.graphics.Color.RED);
 
-        gameOverLabel = new com.badlogic.gdx.scenes.scene2d.ui.Label("Game Over", labelStyle);
+        Label gameOverLabel = new Label("Game Over", labelStyle);
         gameOverLabel.setFontScale(3f);
 
         float x = (this.stage.getWidth() - gameOverLabel.getWidth() * gameOverLabel.getFontScaleX()) / 2f;
@@ -114,6 +115,10 @@ public class GameScreen implements Screen {
 
         this.stage.addActor(gameOverLabel);
 
-        this.metris.fillField(); // fil the field with random colors
+        if (this.randomFieldColors != null) {
+            for (int i = 0; i < Field.MAX_VISIBLE_HEIGHT; ++i) {
+                System.arraycopy(this.randomFieldColors[i], 0, this.metris.field.getColors()[i], 0, Field.MAX_WIDTH);
+            }
+        }
     }
 }
