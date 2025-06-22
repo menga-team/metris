@@ -3,18 +3,27 @@ package dev.menga.metris;
 import java.util.*;
 
 import dev.menga.metris.utils.Vec2i;
+import lombok.Getter;
 
 public abstract class Game {
 
+    @Getter
     Field field = new Field();
 
     // The amount of `elapsed' (milliseconds) that needs to pass for the
     // gravity to pull the current tetromino 1 block.
     long gravityStrengh = 1000;
 
-    Vec2i position;
+    @Getter
     boolean canExchangeHeld = true;
+
+    @Getter
+    Vec2i position;
+
+    @Getter
     Tetromino currentTetromino = null;
+
+    @Getter
     Tetromino holdingTetromino = null;
 
     // TODO: Custom queue impl?
@@ -69,17 +78,33 @@ public abstract class Game {
         return Vec2i.of(4, 19);
     }
 
+    public boolean testPlacement(Vec2i coords) {
+        return this.testPlacement(this.currentTetromino, coords);
+    }
+
     public boolean testPlacement(Tetromino tet, Vec2i coords) {
         Vec2i[] tiles = tet.getShape().getTiles();
-        boolean fits = true;
         for (int i = 0; i < tiles.length; ++i) {
             Vec2i testPos = coords.add(tiles[i]);
-            if (this.field.colors[testPos.getY()][testPos.getX()].isVisible()) {
-                fits = false;
+            if (!(testPos.getY() >= 0 && testPos.getY() < Field.MAX_HEIGHT &&
+                  testPos.getX() >= 0 && testPos.getX() < Field.MAX_WIDTH)) {
+                return false;
+            }
+            if (this.getField().getAt(testPos).isVisible()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public Vec2i getHardDropPosition() {
+        Vec2i testPos = new Vec2i(this.position).add(0, 1);
+        while(testPos.y-- > 0) {
+            if (!this.testPlacement(testPos.add(0, -1))) {
                 break;
             }
         }
-        return fits;
+        return testPos;
     }
 
     public boolean move(Vec2i offset) {
@@ -100,16 +125,40 @@ public abstract class Game {
     }
 
     public boolean moveDown() {
-        boolean ok = this.move(Vec2i.of(0, 1));
+        boolean ok = this.move(Vec2i.of(0, -1));
         if (!ok) {
-            // TODO: Place?
+            this.place();
         }
         return ok;
     }
 
+    public void nextTetromino() {
+        this.currentTetromino = this.pollNextTetromino();
+        this.position = this.getSpawnPosition();
+        this.gravityTimer = 0;
+    }
+
+    public void hardDrop() {
+        if (this.getPosition().equals(this.getHardDropPosition())) {
+            this.place();
+        } else {
+            this.position = this.getHardDropPosition();
+            this.gravityTimer = 0;
+        }
+    }
+
+    public void place(Tetromino tet, Vec2i pos) {
+        this.field.rasterizeTetromino(tet, pos);
+        this.nextTetromino();
+    }
+
+    public void place() {
+        this.place(this.getCurrentTetromino(), this.getPosition());
+    }
+
     // TODO: Right now delta gets passed as milliseconds, investigate if
     // that is OK.
-    public void update(long delta) {
+    public void tick(long delta) {
         this.elapsed += delta;
         this.gravityTimer += delta;
 

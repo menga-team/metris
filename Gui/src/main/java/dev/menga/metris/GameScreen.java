@@ -34,9 +34,12 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        this.metris.update(delta);
+        // TODO: Accumulate rounding error.
+        long deltaInMs = Math.round(delta * 1000f);
+        this.inputHandler.update(deltaInMs);
+        this.metris.update(deltaInMs);
 
-        Gdx.gl.glClearColor(30 / 255f, 30 / 255f, 30 / 255f, 1f);
+        Gdx.gl.glClearColor(50 / 255f, 50 / 255f, 50 / 255f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         this.game.batch.setProjectionMatrix(this.camera.combined);

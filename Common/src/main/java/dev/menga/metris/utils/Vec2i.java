@@ -22,8 +22,26 @@ public class Vec2i {
         return Vec2i.of(rhs.getX() + this.getX(), rhs.getY() + this.getY());
     }
 
+    public Vec2i add(int x, int y) {
+        return Vec2i.of(x + this.getX(), y + this.getY());
+    }
+
+    public void scaleMut(int by) {
+        this.x *= by;
+        this.y *= by;
+    }
+
+    public Vec2i scale(int by) {
+        return Vec2i.of(by * this.getX(), by* this.getY());
+    }
+
     public Vec2i(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    public Vec2i(Vec2i from) {
+        this.x = from.getX();
+        this.y = from.getY();
     }
 }

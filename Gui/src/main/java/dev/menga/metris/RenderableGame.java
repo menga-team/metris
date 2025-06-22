@@ -1,6 +1,8 @@
 package dev.menga.metris;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+
 import dev.menga.metris.utils.Vec2i;
 
 import java.util.*;
@@ -13,7 +15,6 @@ public class RenderableGame extends Game {
     private Resources resources;
     private final Vec2i gridOff;
     private final Vec2i nextOff;
-
 
     // TODO: RenderConfig class ?
     public RenderableGame(Resources resources, Vec2i gridOff, Vec2i nextOff) {
@@ -40,20 +41,50 @@ public class RenderableGame extends Game {
                 }
             }
         }
+
+        // Render current tetromino.
+        this.renderTetromino(batch, this.getCurrentTetromino(), this.pixelPos(this.getPosition()));
+        // Render ghost of current tetromino.
+        this.renderTetromino(batch, this.getCurrentTetromino(), this.pixelPos(this.getHardDropPosition()), true);
+
         // Render upcoming tetrominos.
         Tetromino[] preview = this.getNextTetrominos(NEXT_TETROMINOS);
         for (int i = 0; i < NEXT_TETROMINOS; ++i) {
-            for (Vec2i tile : preview[i].getShape().getTiles()) {
-                batch.draw(this.resources.getColor(preview[i].getColor()),
-                           this.nextOff.getX() + (FIELD_RENDER_UNIT * tile.getX()),
-                           this.nextOff.getY() + i * FIELD_RENDER_UNIT * 4 + (FIELD_RENDER_UNIT * tile.getY()));
-            }
+            this.renderTetromino(batch, preview[i], Vec2i.of(this.nextOff.getX(),
+                                                             this.nextOff.getY() + i * FIELD_RENDER_UNIT * 4));
         }
     }
 
-    public void update(float delta) {
-        long deltaInMs = Math.round(delta * 1000f);
-        this.update(deltaInMs);
+    public Vec2i pixelPos(Vec2i fieldPos) {
+        Vec2i pixelPos = new Vec2i(fieldPos);
+        pixelPos.scaleMut(FIELD_RENDER_UNIT);
+        pixelPos.addMut(this.gridOff);
+        return pixelPos;
+    }
+
+    public void renderTetromino(Batch batch, Tetromino toRender, Vec2i position) {
+        this.renderTetromino(batch, toRender, position, false);
+    }
+
+    public void renderTetromino(Batch batch, Tetromino toRender, Vec2i position, boolean ghost) {
+        TextureRegion texture;
+        if (ghost) {
+            texture = this.resources.getGhostColor(toRender.getColor());
+        } else {
+            texture = this.resources.getColor(toRender.getColor());
+        }
+
+        for (Vec2i tile : toRender.getShape().getTiles()) {
+            batch.draw(
+                texture,
+                position.getX() + (FIELD_RENDER_UNIT * tile.getX()),
+                position.getY() + (FIELD_RENDER_UNIT * tile.getY())
+            );
+        }
+    }
+
+    public void update(long delta) {
+        this.tick(delta);
     }
 
     @Override
