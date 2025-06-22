@@ -18,6 +18,9 @@ public abstract class Game {
     boolean canExchangeHeld = true;
 
     @Getter
+    boolean gameOver = false;
+
+    @Getter
     Vec2i position;
 
     @Getter
@@ -52,9 +55,10 @@ public abstract class Game {
 
     /**
      * This method is able to preview at least the next 7 tetrominos (1 full bag).
-     * @param  Amount How many elements it should list.
+     *
+     * @param amount How many elements it should list.
      * @return An array with the specified amount of tetrominos inside it.
-     *         If `amount' > 7 there might be less but at least 7.
+     * If `amount' > 7 there might be less but at least 7.
      */
     public Tetromino[] getNextTetrominos(int amount) {
         Tetromino[] preview = new Tetromino[amount];
@@ -73,9 +77,11 @@ public abstract class Game {
     }
 
     public Vec2i getSpawnPosition() {
-        // TODO: When field is overfilled, give player a last chance by
-        // moving the spawn position up a bit.
-        return Vec2i.of(4, 19);
+        Vec2i spawnPos = new Vec2i(4, 18);
+        if (!this.testPlacement(spawnPos)) {
+            spawnPos.addMut(0, 1);
+        }
+        return spawnPos;
     }
 
     public boolean testPlacement(Vec2i coords) {
@@ -86,8 +92,7 @@ public abstract class Game {
         Vec2i[] tiles = tet.getShape().getTiles();
         for (int i = 0; i < tiles.length; ++i) {
             Vec2i testPos = coords.add(tiles[i]);
-            if (!(testPos.getY() >= 0 && testPos.getY() < Field.MAX_HEIGHT &&
-                 testPos.getX() >= 0 && testPos.getX() < Field.MAX_WIDTH)) {
+            if (!(testPos.getY() >= 0 && testPos.getY() < Field.MAX_HEIGHT && testPos.getX() >= 0 && testPos.getX() < Field.MAX_WIDTH)) {
                 return false;
             }
             if (this.getField().getAt(testPos).isVisible()) {
@@ -99,7 +104,7 @@ public abstract class Game {
 
     public Vec2i getHardDropPosition() {
         Vec2i testPos = new Vec2i(this.position).add(0, 1);
-        while(testPos.y-- > 0) {
+        while (testPos.y-- > 0) {
             if (!this.testPlacement(testPos.add(0, -1))) {
                 break;
             }
@@ -108,6 +113,10 @@ public abstract class Game {
     }
 
     public boolean move(Vec2i offset) {
+        if (this.gameOver) {
+            return false;
+        }
+
         Vec2i newPos = this.position.add(offset);
         if (testPlacement(this.currentTetromino, newPos)) {
             this.position = newPos;
@@ -135,10 +144,18 @@ public abstract class Game {
     public void nextTetromino() {
         this.currentTetromino = this.pollNextTetromino();
         this.position = this.getSpawnPosition();
+        if (!this.testPlacement(this.currentTetromino, this.position)) {
+            this.gameOver = true;
+            return;
+        }
         this.gravityTimer = 0;
     }
 
     public void hardDrop() {
+        if (this.gameOver) {
+            return;
+        }
+
         if (!this.testPlacement(this.getPosition().add(0, -1))) {
             this.place();
         } else {
@@ -149,7 +166,23 @@ public abstract class Game {
 
     public void place(Tetromino tet, Vec2i pos) {
         this.field.rasterizeTetromino(tet, pos);
-        this.nextTetromino();
+
+//        if (!this.testPlacement(tet, pos)) {
+//            this.gameOver = true;
+//        }
+
+        if (!this.gameOver) {
+            this.nextTetromino();
+        }
+
+//        Vec2i[] tiles = tet.getShape().getTiles();
+//        for (Vec2i tile : tiles) {
+//            Vec2i tilePos = pos.add(tile);
+//            if (tilePos.getY() >= Field.MAX_VISIBLE_HEIGHT) {
+//                this.gameOver = true;
+//                break;
+//            }
+//        }
     }
 
     public void place() {
@@ -167,42 +200,39 @@ public abstract class Game {
     }
 
     public boolean rotate(Rotation rot) {
+        if (this.gameOver) {
+            return false;
+        }
+
         Vec2i[][] offsetData;
         Rotation currentRot = this.getCurrentTetromino().getRotation();
         switch (this.getCurrentTetromino()) {
-        case Tetromino.I:
-            offsetData = Tetromino.OFFSET_DATA_I;
-            break;
-        case Tetromino.J:
-        case Tetromino.L:
-        case Tetromino.S:
-        case Tetromino.T:
-        case Tetromino.Z:
-            offsetData = Tetromino.OFFSET_DATA_JLSTZ;
-            break;
-        case Tetromino.O:
-            Vec2i kick = Tetromino.OFFSET_DATA_O[currentRot.getIndex()]
-                         .sub(Tetromino.OFFSET_DATA_O[rot.getIndex()]);
-            this.position.addMut(kick);
-            this.currentTetromino.setRotation(rot);
-            return true;
-        default:
-            return false;
+            case Tetromino.I:
+                offsetData = Tetromino.OFFSET_DATA_I;
+                break;
+            case Tetromino.J:
+            case Tetromino.L:
+            case Tetromino.S:
+            case Tetromino.T:
+            case Tetromino.Z:
+                offsetData = Tetromino.OFFSET_DATA_JLSTZ;
+                break;
+            case Tetromino.O:
+                Vec2i kick = Tetromino.OFFSET_DATA_O[currentRot.getIndex()].sub(Tetromino.OFFSET_DATA_O[rot.getIndex()]);
+                this.position.addMut(kick);
+                this.currentTetromino.setRotation(rot);
+                return true;
+            default:
+                return false;
         }
         this.currentTetromino.setRotation(rot);
 
-        Vec2i[] tests = {
-            offsetData[currentRot.getIndex()][0].sub(offsetData[rot.getIndex()][0]),
-            offsetData[currentRot.getIndex()][1].sub(offsetData[rot.getIndex()][1]),
-            offsetData[currentRot.getIndex()][2].sub(offsetData[rot.getIndex()][2]),
-            offsetData[currentRot.getIndex()][3].sub(offsetData[rot.getIndex()][3]),
-            offsetData[currentRot.getIndex()][4].sub(offsetData[rot.getIndex()][4]),
-        };
+        Vec2i[] tests = {offsetData[currentRot.getIndex()][0].sub(offsetData[rot.getIndex()][0]), offsetData[currentRot.getIndex()][1].sub(offsetData[rot.getIndex()][1]), offsetData[currentRot.getIndex()][2].sub(offsetData[rot.getIndex()][2]), offsetData[currentRot.getIndex()][3].sub(offsetData[rot.getIndex()][3]), offsetData[currentRot.getIndex()][4].sub(offsetData[rot.getIndex()][4]),};
 
         int kick = 0;
         boolean fits = false;
-        for(; kick < 5; ++kick) {
-            if (this.testPlacement(this.getPosition().add(tests[kick]))){
+        for (; kick < 5; ++kick) {
+            if (this.testPlacement(this.getPosition().add(tests[kick]))) {
                 fits = true;
                 break;
             }
@@ -227,6 +257,10 @@ public abstract class Game {
     // TODO: Right now delta gets passed as milliseconds, investigate if
     // that is OK.
     public void tick(long delta) {
+        if (this.gameOver) {
+            return;
+        }
+
         this.elapsed += delta;
         this.gravityTimer += delta;
 
@@ -234,22 +268,21 @@ public abstract class Game {
             this.gravityTimer -= this.gravityStrengh;
             this.moveDown();
         }
-//        Metris.getLogger().info("------");
-//        Metris.getLogger().info("{}", this.getPosition().add(this.getCurrentTetromino().getShape().getTiles()[0]));
-//        Metris.getLogger().info("{}", this.getPosition().add(this.getCurrentTetromino().getShape().getTiles()[1]));
-//        Metris.getLogger().info("{}", this.getPosition().add(this.getCurrentTetromino().getShape().getTiles()[2]));
-//        Metris.getLogger().info("{}", this.getPosition().add(this.getCurrentTetromino().getShape().getTiles()[3]));
     }
 
     public Game() {
         this.refillBags();
         this.refillBags();
-        this.position = this.getSpawnPosition();
         this.currentTetromino = this.pollNextTetromino();
+        this.position = this.getSpawnPosition();
     }
 
     public void holdPiece() {
-        if (canExchangeHeld){
+        if (this.gameOver) {
+            return;
+        }
+
+        if (canExchangeHeld) {
             if (this.holdingTetromino == null) {
                 this.holdingTetromino = this.currentTetromino;
                 this.nextTetromino();
