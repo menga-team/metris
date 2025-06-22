@@ -87,7 +87,7 @@ public abstract class Game {
         for (int i = 0; i < tiles.length; ++i) {
             Vec2i testPos = coords.add(tiles[i]);
             if (!(testPos.getY() >= 0 && testPos.getY() < Field.MAX_HEIGHT &&
-                  testPos.getX() >= 0 && testPos.getX() < Field.MAX_WIDTH)) {
+                 testPos.getX() >= 0 && testPos.getX() < Field.MAX_WIDTH)) {
                 return false;
             }
             if (this.getField().getAt(testPos).isVisible()) {
@@ -179,6 +179,7 @@ public abstract class Game {
         default:
             return false;
         }
+        this.currentTetromino.setRotation(rot);
 
         Vec2i[] tests = {
             offsetData[currentRot.getIndex()][0].sub(offsetData[rot.getIndex()][0]),
@@ -199,7 +200,8 @@ public abstract class Game {
 
         if (fits) {
             this.position.addMut(tests[kick]);
-            this.currentTetromino.setRotation(rot);
+        } else {
+            this.currentTetromino.setRotation(currentRot);
         }
         return fits;
     }
@@ -222,6 +224,11 @@ public abstract class Game {
             this.gravityTimer -= this.gravityStrengh;
             this.moveDown();
         }
+//        Metris.getLogger().info("------");
+//        Metris.getLogger().info("{}", this.getPosition().add(this.getCurrentTetromino().getShape().getTiles()[0]));
+//        Metris.getLogger().info("{}", this.getPosition().add(this.getCurrentTetromino().getShape().getTiles()[1]));
+//        Metris.getLogger().info("{}", this.getPosition().add(this.getCurrentTetromino().getShape().getTiles()[2]));
+//        Metris.getLogger().info("{}", this.getPosition().add(this.getCurrentTetromino().getShape().getTiles()[3]));
     }
 
     public Game() {
