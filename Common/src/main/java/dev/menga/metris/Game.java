@@ -159,7 +159,7 @@ public abstract class Game {
     }
 
     public void clearLines() {
-        for (int i = 0; i < Field.MAX_HEIGHT; ++i) {
+        for (int i = Field.MAX_HEIGHT-1; i >=0; --i) {
             if (this.field.isLineFull(i)) {
                 this.field.moveLinesDown(i + 1);
             }
