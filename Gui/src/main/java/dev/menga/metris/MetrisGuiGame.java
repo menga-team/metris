@@ -3,6 +3,8 @@ package dev.menga.metris;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Cursor;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -50,6 +52,14 @@ public class MetrisGuiGame extends Game {
             }
         };
         this.screen.setWidgets(menuWidgetList);
+
+        Pixmap pixmap = new Pixmap(Gdx.files.internal("cursor.png"));
+// Set hotspot to the middle of it (0,0 would be the top-left corner)
+        int xHotspot = 15, yHotspot = 15;
+        Cursor cursor = Gdx.graphics.newCursor(pixmap, xHotspot, yHotspot);
+        pixmap.dispose(); // We don't need the pixmap anymore
+        Gdx.graphics.setCursor(cursor);
+
     }
 
     @Override
