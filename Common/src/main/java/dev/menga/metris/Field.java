@@ -34,4 +34,22 @@ public class Field {
             this.setAt(pos.add(tiles[i]), tet.getColor());
         }
     }
+
+    public boolean isLineFull(int i) {
+        for (int j = 0; j < MAX_WIDTH; ++j) {
+            if (this.colors[i][j] == Color.VOID) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void moveLinesDown(int i) {
+        for (int j = i; j < MAX_HEIGHT; j++) {
+            if (j == 0){
+                continue;
+            }
+            System.arraycopy(this.colors[j], 0, this.colors[j - 1], 0, MAX_WIDTH);
+        }
+    }
 }

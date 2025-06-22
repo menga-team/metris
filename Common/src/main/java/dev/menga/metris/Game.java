@@ -154,6 +154,15 @@ public abstract class Game {
 
     public void place() {
         this.place(this.getCurrentTetromino(), this.getPosition());
+        clearLines();
+    }
+
+    public void clearLines() {
+        for (int i = 0; i < Field.MAX_HEIGHT; ++i) {
+            if (this.field.isLineFull(i)) {
+                this.field.moveLinesDown(i + 1);
+            }
+        }
     }
 
     public boolean rotate(Rotation rot) {
