@@ -57,4 +57,9 @@ public class Vec2i {
         this.x = from.getX();
         this.y = from.getY();
     }
+
+    @Override
+    public String toString() {
+        return "X: " + this.getX() + " Y: " + this.getY();
+    }
 }
