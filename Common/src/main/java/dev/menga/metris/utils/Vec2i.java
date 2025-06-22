@@ -18,6 +18,11 @@ public class Vec2i {
         this.y += rhs.y;
     }
 
+    public void addMut(int x, int y) {
+        this.x += x;
+        this.y += y;
+    }
+
     public Vec2i add(Vec2i rhs) {
         return Vec2i.of(rhs.getX() + this.getX(), rhs.getY() + this.getY());
     }
