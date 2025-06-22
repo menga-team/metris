@@ -14,6 +14,8 @@ public class GameScreen implements Screen {
 
     private MetrisGuiGame game;
 
+    private float deltaAccumulator = 0f;
+
     public GameScreen(MetrisGuiGame game) {
         this.game = game;
     }
@@ -35,7 +37,13 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         // TODO: Accumulate rounding error.
-        long deltaInMs = Math.round(delta * 1000f);
+//        long deltaInMs = Math.round(delta * 1000f);
+        long deltaInMs = (long) (delta * 1000f);
+        this.deltaAccumulator += delta % (1/1000f);
+        if (this.deltaAccumulator >= (1/1000f)) {
+            deltaInMs+= (long) (deltaAccumulator / (1/1000f));
+            this.deltaAccumulator %= (1/1000f);
+        }
         this.inputHandler.update(deltaInMs);
         this.metris.update(deltaInMs);
 

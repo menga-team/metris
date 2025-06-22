@@ -31,13 +31,9 @@ public class RenderableGame extends Game {
                 Color color = this.field.getColors()[y][x];
                 // TODO: Maybe rethink visible sprites and keep the void
                 // a normal sprite as any other color/garbage?
-                batch.draw(this.resources.getUnit(),
-                           this.gridOff.getX() + (FIELD_RENDER_UNIT * x),
-                           this.gridOff.getY() + (FIELD_RENDER_UNIT * y));
+                batch.draw(this.resources.getUnit(), this.gridOff.getX() + (FIELD_RENDER_UNIT * x), this.gridOff.getY() + (FIELD_RENDER_UNIT * y));
                 if (color.isVisible()) {
-                    batch.draw(this.resources.getColor(color),
-                               this.gridOff.getX() + (FIELD_RENDER_UNIT * x),
-                               this.gridOff.getY() + (FIELD_RENDER_UNIT * y));
+                    batch.draw(this.resources.getColor(color), this.gridOff.getX() + (FIELD_RENDER_UNIT * x), this.gridOff.getY() + (FIELD_RENDER_UNIT * y));
                 }
             }
         }
@@ -49,9 +45,10 @@ public class RenderableGame extends Game {
 
         // Render upcoming tetrominos.
         Tetromino[] preview = this.getNextTetrominos(NEXT_TETROMINOS);
+
         for (int i = 0; i < NEXT_TETROMINOS; ++i) {
-            this.renderTetromino(batch, preview[i], Vec2i.of(this.nextOff.getX(),
-                                                             this.nextOff.getY() + i * FIELD_RENDER_UNIT * 4));
+
+            this.renderTetromino(batch, preview[NEXT_TETROMINOS - 1 - i], Vec2i.of(this.nextOff.getX(), this.nextOff.getY() + i * FIELD_RENDER_UNIT * 4));
         }
     }
 
@@ -75,11 +72,7 @@ public class RenderableGame extends Game {
         }
 
         for (Vec2i tile : toRender.getShape().getTiles()) {
-            batch.draw(
-                texture,
-                position.getX() + (FIELD_RENDER_UNIT * tile.getX()),
-                position.getY() + (FIELD_RENDER_UNIT * tile.getY())
-            );
+            batch.draw(texture, position.getX() + (FIELD_RENDER_UNIT * tile.getX()), position.getY() + (FIELD_RENDER_UNIT * tile.getY()));
         }
     }
 
