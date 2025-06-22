@@ -2,6 +2,7 @@ package dev.menga.metris;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -11,6 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import dev.menga.metris.utils.Vec2i;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -32,12 +35,23 @@ public class GameScreen implements Screen {
     private Stage stage;
     private final Color[][] randomFieldColors = new Color[Field.MAX_VISIBLE_HEIGHT][Field.MAX_WIDTH];
 
+    @Getter
+    private Sound sound;
+    @Getter
+    private long bgmId;
+
     @Override
     public void show() {
         this.metris = new RenderableGame(this.game.resources, Vec2i.of(160, 0), Vec2i.of(546, 160), Vec2i.of(60, 560));
         this.inputHandler = new InputHandler(this.metris);
         this.stage = new Stage(this.viewport, this.game.batch);
         Gdx.input.setInputProcessor(this.inputHandler);
+
+        // Setup music
+        this.sound = Gdx.audio.newSound(Gdx.files.internal("simabito.ogg"));
+        this.bgmId = this.sound.play(1f);
+        this.sound.setLooping(this.getBgmId(), true);
+        this.sound.setPitch(this.getBgmId(), 1f);
 
         // Generate random field colors for game over
         Random rand = new Random();
@@ -66,6 +80,8 @@ public class GameScreen implements Screen {
         this.game.batch.setProjectionMatrix(this.camera.combined);
         this.game.batch.begin();
         this.metris.render(this.game.batch);
+        final float musicSpeed = 1000f / this.metris.getGravityStrength();
+        this.getSound().setPitch(this.getBgmId(), musicSpeed);
         this.game.batch.end();
 
         this.stage.act(delta);
@@ -98,7 +114,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        this.sound.dispose();
+        this.stage.dispose();
     }
 
     public void gameOver() {
@@ -115,10 +132,10 @@ public class GameScreen implements Screen {
 
         this.stage.addActor(gameOverLabel);
 
-        if (this.randomFieldColors != null) {
-            for (int i = 0; i < Field.MAX_VISIBLE_HEIGHT; ++i) {
-                System.arraycopy(this.randomFieldColors[i], 0, this.metris.field.getColors()[i], 0, Field.MAX_WIDTH);
-            }
+        for (int i = 0; i < Field.MAX_VISIBLE_HEIGHT; ++i) {
+            System.arraycopy(this.randomFieldColors[i], 0, this.metris.field.getColors()[i], 0, Field.MAX_WIDTH);
         }
+
+        this.getSound().stop();
     }
 }
