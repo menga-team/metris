@@ -12,7 +12,8 @@ public abstract class Game {
 
     // The amount of `elapsed' (milliseconds) that needs to pass for the
     // gravity to pull the current tetromino 1 block.
-    long gravityStrength = 1000;
+    @Getter
+    int gravityStrength = 1000;
 
     @Getter
     boolean canExchangeHeld = true;
@@ -28,6 +29,9 @@ public abstract class Game {
 
     @Getter
     Tetromino holdingTetromino = null;
+
+    @Getter
+    int linesCleared = 0;
 
     Queue<Tetromino> bagA = null;
     Queue<Tetromino> bagB = null;
@@ -182,6 +186,7 @@ public abstract class Game {
         for (int i = Field.MAX_HEIGHT - 1; i >= 0; --i) {
             if (this.field.isLineFull(i)) {
                 this.field.moveLinesDown(i + 1);
+                this.linesCleared++;
             }
         }
     }
@@ -255,6 +260,9 @@ public abstract class Game {
 
         this.elapsed += delta;
         this.gravityTimer += delta;
+
+        // TODO: Bad formula
+        this.gravityStrength = 1000 - (50 * this.getLinesCleared());
 
         if (this.gravityTimer >= this.gravityStrength) {
             this.gravityTimer -= this.gravityStrength;
