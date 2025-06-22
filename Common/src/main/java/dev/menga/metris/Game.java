@@ -139,7 +139,7 @@ public abstract class Game {
     }
 
     public void hardDrop() {
-        if (this.getPosition().equals(this.getHardDropPosition())) {
+        if (!this.testPlacement(this.getPosition().add(0, -1))) {
             this.place();
         } else {
             this.position = this.getHardDropPosition();

@@ -28,17 +28,18 @@ public class InputHandler implements InputProcessor {
     }
 
     public void update(long delta) {
-        this.held.forEach(
-            (kc, timer) -> {
-                if (timer >= 500) {
-                    if (lastTrigger.getOrDefault(kc, 0) >= 200) {
-                        lastTrigger.merge(kc, -200, Integer::sum);
-                        this.handleKeycode(kc);
-                    }
-                    lastTrigger.merge(kc, (int) delta, Integer::sum);
+        for (Map.Entry<Integer, Integer> entry : this.held.entrySet()) {
+            int kc = entry.getKey();
+            int timer = entry.getValue();
+            if (timer >= 300) {
+                if (lastTrigger.getOrDefault(kc, 0) >= 100) {
+                    lastTrigger.merge(kc, -100, Integer::sum);
+                    this.handleKeycode(kc);
                 }
+                this.lastTrigger.merge(kc, (int) delta, Integer::sum);
             }
-        );
+            entry.setValue(timer + (int) delta);
+        }
     }
 
     @Override
