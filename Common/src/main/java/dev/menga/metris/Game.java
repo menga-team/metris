@@ -78,9 +78,9 @@ public abstract class Game {
 
     public Vec2i getSpawnPosition() {
         Vec2i spawnPos = new Vec2i(4, 18);
-        if (!this.testPlacement(spawnPos)) {
-            spawnPos.addMut(0, 1);
-        }
+//        if (!this.testPlacement(spawnPos)) {
+//            spawnPos.addMut(0, 1);
+//        }
         return spawnPos;
     }
 
