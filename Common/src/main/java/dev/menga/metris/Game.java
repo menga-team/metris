@@ -167,22 +167,9 @@ public abstract class Game {
     public void place(Tetromino tet, Vec2i pos) {
         this.field.rasterizeTetromino(tet, pos);
 
-//        if (!this.testPlacement(tet, pos)) {
-//            this.gameOver = true;
-//        }
-
         if (!this.gameOver) {
             this.nextTetromino();
         }
-
-//        Vec2i[] tiles = tet.getShape().getTiles();
-//        for (Vec2i tile : tiles) {
-//            Vec2i tilePos = pos.add(tile);
-//            if (tilePos.getY() >= Field.MAX_VISIBLE_HEIGHT) {
-//                this.gameOver = true;
-//                break;
-//            }
-//        }
     }
 
     public void place() {
@@ -192,7 +179,7 @@ public abstract class Game {
     }
 
     public void clearLines() {
-        for (int i = Field.MAX_HEIGHT-1; i >=0; --i) {
+        for (int i = Field.MAX_HEIGHT - 1; i >= 0; --i) {
             if (this.field.isLineFull(i)) {
                 this.field.moveLinesDown(i + 1);
             }
