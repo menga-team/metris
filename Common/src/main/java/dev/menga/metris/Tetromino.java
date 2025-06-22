@@ -9,6 +9,28 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/* 0,0 is the center of every piece.  Every specified coordinate will
+ * be filled with one tile.  4 Coordinates make up 1 tetromino.
+ *
+ *	-2,2	-1,2	0,2	1,2	2,2
+ *	-2,1	-1,1	0,1	1,1	2,1
+ *	-2,0	-1,0	0,0	1,0	2,0
+ *	-2,-1	-1,-1	0,1	1,2	2,1
+ *	-2,-2	-1,-2	0,2	1,2	2,2
+ *
+ * E.g. the I tetromino will be spawned like this:
+ * {{-1, 0}, {0, 0}, {1, 0}, {2, 0}}
+ *
+ *	-2,2	-1,2	0,2	1,2	2,2
+ *	-2,1	-1,1	0,1	1,1	2,1
+ *	-2,0	[-1,0]	[0,0]	[1,0]	[2,0]
+ *	-2,-1	-1,-1	0,1	1,2	2,1
+ *	-2,-2	-1,-2	0,2	1,2	2,2
+ *
+ * The rotation matrix was copied from this source:
+ * https://harddrop.com/wiki/SRS
+ */
+
 @Getter
 public enum Tetromino {
     I(new Shape[] {
@@ -54,6 +76,28 @@ public enum Tetromino {
           Shape.quad(Vec2i.of(-1, 1), Vec2i.of(0, 1), Vec2i.of(0, 0), Vec2i.of(0, -1)),   // 270°
       }, Color.ORANGE);
 
+    // Used for rotating (kicks).  See Game.java
+    final static Vec2i[][] OFFSET_DATA_JLSTZ = {
+        {Vec2i.of(0, 0), Vec2i.of(0, 0), Vec2i.of(0, 0), Vec2i.of(0, 0), Vec2i.of(0, 0)},
+        {Vec2i.of(0, 0), Vec2i.of(1, 0), Vec2i.of(1, -1), Vec2i.of(0, 2), Vec2i.of(1, 2)},
+        {Vec2i.of(0, 0), Vec2i.of(0, 0), Vec2i.of(0, 0), Vec2i.of(0, 0), Vec2i.of(0, 0)},
+        {Vec2i.of(0, 0), Vec2i.of(-1, 0), Vec2i.of(-1, -1), Vec2i.of(0, 2), Vec2i.of(-1, 2)},
+    };
+
+    final static Vec2i[][] OFFSET_DATA_I = {
+        {Vec2i.of(0, 0), Vec2i.of(-1, 0), Vec2i.of(2, 0), Vec2i.of(-1, 0), Vec2i.of(2, 0)},
+        {Vec2i.of(-1, 0), Vec2i.of(0, 0), Vec2i.of(0, 0), Vec2i.of(0, 1), Vec2i.of(0, -2)},
+        {Vec2i.of(-1, 1), Vec2i.of(1, 1), Vec2i.of(-2, 1), Vec2i.of(1, 0), Vec2i.of(-2, 0)},
+        {Vec2i.of(0, 1), Vec2i.of(0, 1), Vec2i.of(0, 1), Vec2i.of(0, -1), Vec2i.of(0, 2)},
+    };
+
+    final static Vec2i[] OFFSET_DATA_O = {
+        Vec2i.of(0, 0),
+        Vec2i.of(0, -1),
+        Vec2i.of(-1, -1),
+        Vec2i.of(-1, 0),
+    };
+
     private final Shape[] shapes;
     private final Color color;
 
@@ -65,15 +109,12 @@ public enum Tetromino {
         this.color = color;
     }
 
-    // TODO: Any better way to handle rotation?
     public void rotateCW() {
-        final Rotation[] rotationTranslation = { Rotation.DEG90, Rotation.DEG180, Rotation.DEG270, Rotation.DEG0 };
-        this.setRotation(rotationTranslation[this.getRotation().getIndex()]);
+        this.setRotation(this.getRotation().next());
     }
 
     public void rotateCCW() {
-        final Rotation[] rotationTranslation = { Rotation.DEG270, Rotation.DEG0, Rotation.DEG90, Rotation.DEG180 };
-        this.setRotation(rotationTranslation[this.getRotation().getIndex()]);
+        this.setRotation(this.getRotation().previous());
     }
 
     public Shape getShape() {
@@ -95,6 +136,17 @@ enum Rotation {
 
     @Getter
     private final int index;
+
+    // TODO: Any better way to handle rotation?
+    public Rotation next() {
+        final Rotation[] rotationTranslation = { DEG90, DEG180, DEG270, DEG0 };
+        return rotationTranslation[this.getIndex()];
+    }
+
+    public Rotation previous() {
+        final Rotation[] rotationTranslation = { DEG270, DEG0, DEG90, DEG180 };
+        return rotationTranslation[this.getIndex()];
+    }
 
     Rotation(int index) {
         this.index = index;

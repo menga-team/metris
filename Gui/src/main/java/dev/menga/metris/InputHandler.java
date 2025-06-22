@@ -102,6 +102,8 @@ public class InputHandler implements InputProcessor {
         case Input.Keys.LEFT -> this.getGame().moveLeft();
         case Input.Keys.DOWN -> this.getGame().moveDown();
         case Input.Keys.SPACE -> this.getGame().hardDrop();
+        case Input.Keys.X -> this.getGame().rotateCW();
+        case Input.Keys.Z -> this.getGame().rotateCCW();
         }
     }
 }

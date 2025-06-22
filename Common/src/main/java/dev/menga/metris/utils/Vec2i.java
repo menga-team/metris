@@ -26,13 +26,26 @@ public class Vec2i {
         return Vec2i.of(x + this.getX(), y + this.getY());
     }
 
+    public void subMut(Vec2i rhs) {
+        this.x -= rhs.x;
+        this.y -= rhs.y;
+    }
+
+    public Vec2i sub(Vec2i rhs) {
+        return Vec2i.of(rhs.getX() - this.getX(), rhs.getY() - this.getY());
+    }
+
+    public Vec2i sub(int x, int y) {
+        return Vec2i.of(x - this.getX(), y - this.getY());
+    }
+
     public void scaleMut(int by) {
         this.x *= by;
         this.y *= by;
     }
 
     public Vec2i scale(int by) {
-        return Vec2i.of(by * this.getX(), by* this.getY());
+        return Vec2i.of(by * this.getX(), by * this.getY());
     }
 
     public Vec2i(int x, int y) {

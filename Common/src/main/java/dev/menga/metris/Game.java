@@ -156,6 +156,62 @@ public abstract class Game {
         this.place(this.getCurrentTetromino(), this.getPosition());
     }
 
+    public boolean rotate(Rotation rot) {
+        Vec2i[][] offsetData;
+        Rotation currentRot = this.getCurrentTetromino().getRotation();
+        switch (this.getCurrentTetromino()) {
+        case Tetromino.I:
+            offsetData = Tetromino.OFFSET_DATA_I;
+            break;
+        case Tetromino.J:
+        case Tetromino.L:
+        case Tetromino.S:
+        case Tetromino.T:
+        case Tetromino.Z:
+            offsetData = Tetromino.OFFSET_DATA_JLSTZ;
+            break;
+        case Tetromino.O:
+            Vec2i kick = Tetromino.OFFSET_DATA_O[currentRot.getIndex()]
+                         .sub(Tetromino.OFFSET_DATA_O[rot.getIndex()]);
+            this.position.addMut(kick);
+            this.currentTetromino.setRotation(rot);
+            return true;
+        default:
+            return false;
+        }
+
+        Vec2i[] tests = {
+            offsetData[currentRot.getIndex()][0].sub(offsetData[rot.getIndex()][0]),
+            offsetData[currentRot.getIndex()][1].sub(offsetData[rot.getIndex()][1]),
+            offsetData[currentRot.getIndex()][2].sub(offsetData[rot.getIndex()][2]),
+            offsetData[currentRot.getIndex()][3].sub(offsetData[rot.getIndex()][3]),
+            offsetData[currentRot.getIndex()][4].sub(offsetData[rot.getIndex()][4]),
+        };
+
+        int kick = 0;
+        boolean fits = false;
+        for(; kick < 5; ++kick) {
+            if (this.testPlacement(this.getPosition().add(tests[kick]))){
+                fits = true;
+                break;
+            }
+        }
+
+        if (fits) {
+            this.position.addMut(tests[kick]);
+            this.currentTetromino.setRotation(rot);
+        }
+        return fits;
+    }
+
+    public boolean rotateCW() {
+        return this.rotate(this.getCurrentTetromino().getRotation().next());
+    }
+
+    public boolean rotateCCW() {
+        return this.rotate(this.getCurrentTetromino().getRotation().previous());
+    }
+
     // TODO: Right now delta gets passed as milliseconds, investigate if
     // that is OK.
     public void tick(long delta) {

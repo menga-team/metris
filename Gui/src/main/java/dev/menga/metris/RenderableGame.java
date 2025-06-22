@@ -29,7 +29,7 @@ public class RenderableGame extends Game {
         for (int y = 0; y < Field.MAX_VISIBLE_HEIGHT; ++y) {
             for (int x = 0; x < Field.MAX_WIDTH; ++x) {
                 Color color = this.field.getColors()[y][x];
-                // TODO: Maybe rething visible sprites and keep the void
+                // TODO: Maybe rethink visible sprites and keep the void
                 // a normal sprite as any other color/garbage?
                 batch.draw(this.resources.getUnit(),
                            this.gridOff.getX() + (FIELD_RENDER_UNIT * x),
