@@ -154,6 +154,7 @@ public abstract class Game {
 
     public void place() {
         this.place(this.getCurrentTetromino(), this.getPosition());
+        canExchangeHeld = true;
         clearLines();
     }
 
@@ -245,5 +246,22 @@ public abstract class Game {
         this.refillBags();
         this.position = this.getSpawnPosition();
         this.currentTetromino = this.pollNextTetromino();
+    }
+
+    public void holdPiece() {
+        if (canExchangeHeld){
+            if (this.holdingTetromino == null) {
+                this.holdingTetromino = this.currentTetromino;
+                this.nextTetromino();
+            } else {
+                Tetromino temp = this.currentTetromino;
+                this.currentTetromino = this.holdingTetromino;
+                this.holdingTetromino = temp;
+                this.position = this.getSpawnPosition();
+            }
+            this.canExchangeHeld = false;
+        } else {
+            Metris.getLogger().warn("Cannot exchange held piece right now.");
+        }
     }
 }

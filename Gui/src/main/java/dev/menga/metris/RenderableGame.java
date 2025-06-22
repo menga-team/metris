@@ -15,13 +15,15 @@ public class RenderableGame extends Game {
     private Resources resources;
     private final Vec2i gridOff;
     private final Vec2i nextOff;
+    private final Vec2i heldOff;
 
     // TODO: RenderConfig class ?
-    public RenderableGame(Resources resources, Vec2i gridOff, Vec2i nextOff) {
+    public RenderableGame(Resources resources, Vec2i gridOff, Vec2i nextOff, Vec2i heldOff) {
         super();
         this.resources = resources;
         this.gridOff = gridOff;
         this.nextOff = nextOff;
+        this.heldOff = heldOff;
     }
 
     public void render(Batch batch) {
@@ -49,6 +51,11 @@ public class RenderableGame extends Game {
         for (int i = 0; i < NEXT_TETROMINOS; ++i) {
 
             this.renderTetromino(batch, preview[NEXT_TETROMINOS - 1 - i], Vec2i.of(this.nextOff.getX(), this.nextOff.getY() + i * FIELD_RENDER_UNIT * 4));
+        }
+
+        // Render held tetromino.
+        if (this.getHoldingTetromino() != null) {
+            this.renderTetromino(batch, this.getHoldingTetromino(), Vec2i.of(this.heldOff.getX(), this.heldOff.getY()));
         }
     }
 
