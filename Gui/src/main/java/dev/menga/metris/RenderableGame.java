@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import dev.menga.metris.utils.Vec2i;
+import lombok.Setter;
 
 import java.util.*;
 
@@ -16,6 +17,8 @@ public class RenderableGame extends Game {
     private final Vec2i gridOff;
     private final Vec2i nextOff;
     private final Vec2i heldOff;
+    @Setter
+    private Color[][] randomFieldColors;
 
     // TODO: RenderConfig class ?
     public RenderableGame(Resources resources, Vec2i gridOff, Vec2i nextOff, Vec2i heldOff) {
@@ -49,7 +52,6 @@ public class RenderableGame extends Game {
         Tetromino[] preview = this.getNextTetrominos(NEXT_TETROMINOS);
 
         for (int i = 0; i < NEXT_TETROMINOS; ++i) {
-
             this.renderTetromino(batch, preview[NEXT_TETROMINOS - 1 - i], Vec2i.of(this.nextOff.getX(), this.nextOff.getY() + i * FIELD_RENDER_UNIT * 4));
         }
 
@@ -94,5 +96,16 @@ public class RenderableGame extends Game {
         List<Tetromino> temp = Arrays.asList(Tetromino.values());
         Collections.shuffle(temp);
         this.bagB = new LinkedList<>(temp);
+    }
+
+    public void fillField() {
+        // Fill the fields with random colors generated in show
+        if (this.randomFieldColors != null) {
+            for (int y = 0; y < Field.MAX_VISIBLE_HEIGHT; ++y) {
+                for (int x = 0; x < Field.MAX_WIDTH; ++x) {
+                    this.field.getColors()[y][x] = randomFieldColors[y][x];
+                }
+            }
+        }
     }
 }

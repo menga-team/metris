@@ -10,6 +10,9 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import dev.menga.metris.utils.Vec2i;
 
+import java.util.Arrays;
+import java.util.Random;
+
 public class GameScreen implements Screen {
 
     private MetrisGuiGame game;
@@ -25,6 +28,8 @@ public class GameScreen implements Screen {
     private InputHandler inputHandler;
     private RenderableGame metris;
     private Stage stage;
+    private com.badlogic.gdx.scenes.scene2d.ui.Label gameOverLabel;
+    private final Color[][] randomFieldColors = new Color[Field.MAX_VISIBLE_HEIGHT][Field.MAX_WIDTH];
 
     @Override
     public void show() {
@@ -32,17 +37,25 @@ public class GameScreen implements Screen {
         this.inputHandler = new InputHandler(this.metris);
         this.stage = new Stage(this.viewport, this.game.batch);
         Gdx.input.setInputProcessor(this.inputHandler);
+
+        // Generate random field colors for game over
+        Random rand = new Random();
+        Color[] visibleColors = Arrays.stream(Color.values()).filter(c -> c.getId() >= 2).toArray(Color[]::new);
+        for (int y = 0; y < Field.MAX_VISIBLE_HEIGHT; ++y) {
+            for (int x = 0; x < Field.MAX_WIDTH; ++x) {
+                randomFieldColors[y][x] = visibleColors[rand.nextInt(visibleColors.length)];
+            }
+        }
+        this.metris.setRandomFieldColors(randomFieldColors);
     }
 
     @Override
     public void render(float delta) {
-        // TODO: Accumulate rounding error.
-//        long deltaInMs = Math.round(delta * 1000f);
         long deltaInMs = (long) (delta * 1000f);
-        this.deltaAccumulator += delta % (1/1000f);
-        if (this.deltaAccumulator >= (1/1000f)) {
-            deltaInMs+= (long) (deltaAccumulator / (1/1000f));
-            this.deltaAccumulator %= (1/1000f);
+        this.deltaAccumulator += delta % (1 / 1000f);
+        if (this.deltaAccumulator >= (1 / 1000f)) {
+            deltaInMs += (long) (deltaAccumulator / (1 / 1000f));
+            this.deltaAccumulator %= (1 / 1000f);
         }
         this.inputHandler.update(deltaInMs);
         this.metris.update(deltaInMs);
@@ -57,6 +70,10 @@ public class GameScreen implements Screen {
 
         this.stage.act(delta);
         this.stage.draw();
+
+        if (this.metris.isGameOver()) {
+            this.gameOver();
+        }
     }
 
     @Override
@@ -82,5 +99,21 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
 
+    }
+
+    public void gameOver() {
+        // show a game over text on the existing screen
+        com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle labelStyle = new com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle(this.game.resources.getDefaultFont(), com.badlogic.gdx.graphics.Color.RED);
+
+        gameOverLabel = new com.badlogic.gdx.scenes.scene2d.ui.Label("Game Over", labelStyle);
+        gameOverLabel.setFontScale(3f);
+
+        float x = (this.stage.getWidth() - gameOverLabel.getWidth() * gameOverLabel.getFontScaleX()) / 2f;
+        float y = (this.stage.getHeight() - gameOverLabel.getHeight() * gameOverLabel.getFontScaleY()) / 2f;
+        gameOverLabel.setPosition(x, y);
+
+        this.stage.addActor(gameOverLabel);
+
+        this.metris.fillField(); // fil the field with random colors
     }
 }

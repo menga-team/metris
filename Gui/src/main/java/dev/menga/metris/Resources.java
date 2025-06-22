@@ -2,6 +2,7 @@ package dev.menga.metris;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
@@ -16,6 +17,7 @@ public class Resources implements Disposable {
     final private TextureRegion unit;
     final private TextureRegion[] colorTextures;
     final private TextureRegion[] ghostColorTextures;
+
 
     Resources() {
         this.assetManager.load("textures.atlas", TextureAtlas.class);
@@ -36,6 +38,10 @@ public class Resources implements Disposable {
 
     public TextureRegion getGhostColor(Color color) {
         return this.ghostColorTextures[color.getId()];
+    }
+
+    public BitmapFont getDefaultFont() {
+        return new BitmapFont();
     }
 
     @Override
