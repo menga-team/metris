@@ -48,7 +48,7 @@ public class MenuButton extends Widget {
     }
 
     public boolean isFocussed() {
-        return this.getMenuScreen().getWidgets().get(this.getMenuScreen().focussedWidget) == this;
+        return this.getMenuScreen().getWidgets().get(this.getMenuScreen().focusedWidget) == this;
     }
 
     public void click() {

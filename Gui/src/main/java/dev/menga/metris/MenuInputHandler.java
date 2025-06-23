@@ -42,7 +42,7 @@ public class MenuInputHandler implements InputProcessor {
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         screenY = Gdx.graphics.getHeight() - screenY; // Invert y coordinate for GUI
         if (button != Input.Buttons.LEFT || pointer > 0) return false;
-        Metris.getLogger().info("Left click at " + screenX + ", " + screenY);
+        Metris.getLogger().debug("Left click at " + screenX + ", " + screenY);
         for (Widget widget : this.menu.getWidgets()) {
             if (screenX >= widget.getX() && screenX <= widget.getX() + widget.getWidth() && screenY >= widget.getY() && screenY <= widget.getY() + widget.getHeight()) {
                 widget.click();
@@ -74,17 +74,6 @@ public class MenuInputHandler implements InputProcessor {
         return true;
     }
 
-//    public void LeftClick(int x, int y) {
-//        y = Gdx.graphics.getHeight() - y; // Invert y coordinate for GUI
-//        Metris.getLogger().info("Left click at " + x + ", " + y);
-//        for (MenuButton widget : this.menu.getWidgets()) {
-//            if (x >= widget.getX() && x <= widget.getX() + widget.getWidth() && y >= widget.getY() && y <= widget.getY() + widget.getHeight()) {
-//                widget.click();
-//                return;
-//            }
-//        }
-//    }
-
     @Override
     public boolean scrolled(float v, float v1) {
         return false;
@@ -96,7 +85,6 @@ public class MenuInputHandler implements InputProcessor {
             case Input.Keys.DOWN -> this.getMenu().nextFocussedWidget();
             case Input.Keys.ENTER -> this.getMenu().enterFocussedWidget();
             case Input.Keys.SPACE -> this.getMenu().enterFocussedWidget();
-//            case Input..LEFT ->  this.LeftClick(Gdx.input.getX(), Gdx.input.getY());
         }
     }
 }

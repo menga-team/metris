@@ -2,8 +2,6 @@ package dev.menga.metris;
 
 import java.util.*;
 
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.backends.lwjgl3.audio.Mp3;
 import dev.menga.metris.utils.Vec2i;
 import lombok.Getter;
 

@@ -3,23 +3,21 @@ package dev.menga.metris;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
-
 import lombok.Getter;
+import lombok.Setter;
 
-public class InputHandler implements InputProcessor {
+public class GameInputHandler implements ActiveInputProcessor {
 
     @Getter
+    @Setter
     private Game game;
     private final Map<Integer, Integer> held;
     private final Map<Integer, Integer> lastTrigger;
 
-    public InputHandler(Game game) {
+    public GameInputHandler() {
         this.held = new HashMap<Integer, Integer>();
         this.lastTrigger = new HashMap<Integer, Integer>();
-        this.game = game;
     }
 
     private boolean isRepeatable(int kc) {
@@ -102,6 +100,10 @@ public class InputHandler implements InputProcessor {
     }
 
     public void handleKeycode(int keycode) {
+        if (this.getGame() == null) {
+            Metris.getLogger().error("InputHandler has no Game to control!");
+            return;
+        }
         switch (keycode) {
         case Input.Keys.RIGHT -> this.getGame().moveRight();
         case Input.Keys.LEFT -> this.getGame().moveLeft();

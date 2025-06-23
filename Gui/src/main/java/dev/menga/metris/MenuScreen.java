@@ -1,6 +1,5 @@
 package dev.menga.metris;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
@@ -27,7 +26,7 @@ public class MenuScreen implements Screen {
     @Setter
     private ArrayList<Widget> widgets = new ArrayList<>();
 
-    public int focussedWidget = 0;
+    public int focusedWidget = 0;
 
     BitmapFont font = new BitmapFont();
 
@@ -35,10 +34,8 @@ public class MenuScreen implements Screen {
     @Getter
     private int yPadding = 32;
 
-    private Camera camera = new OrthographicCamera(800, 800);
-    private Viewport viewport = new ExtendViewport(800, 800, camera);
-    private MenuInputHandler MenuInputHandler;
-    //    private RenderableGame metris;
+    private final Camera camera = new OrthographicCamera(800, 800);
+    private final Viewport viewport = new ExtendViewport(800, 800, camera);
     private Stage stage;
 
     private final ShapeRenderer shapeRenderer = new ShapeRenderer();
@@ -56,13 +53,13 @@ public class MenuScreen implements Screen {
 
     @Override
     public void show() {
-        this.MenuInputHandler = new MenuInputHandler(this);
+        MenuInputHandler menuInputHandler = new MenuInputHandler(this);
         shapeRenderer.setAutoShapeType(true);
-        this.stage = new Stage(this.viewport, this.game.batch);
-        Gdx.input.setInputProcessor(this.MenuInputHandler);
+        this.stage = new Stage(this.viewport, this.game.getBatch());
+        Gdx.input.setInputProcessor(menuInputHandler);
         this.font = new BitmapFont();
 
-//        Setup music
+        // Setup music
         // TODO: Fix long starting/loading time -> compress the music file ig?
         this.titleMusic = Gdx.audio.newSound(Gdx.files.internal("titleMusic.mp3"));
         this.titleMusicId = this.titleMusic.play(1f);
@@ -76,10 +73,10 @@ public class MenuScreen implements Screen {
             widget.setMenuScreen(this);
             widget.show();
         }
-        if (this.widgets.size() > 0) {
-            this.focussedWidget = 0;
+        if (!this.widgets.isEmpty()) {
+            this.focusedWidget = 0;
         } else {
-            this.focussedWidget = -1; // No widgets available
+            this.focusedWidget = -1; // No widgets available
         }
     }
 
@@ -89,18 +86,13 @@ public class MenuScreen implements Screen {
         Gdx.gl.glClearColor(50 / 255f, 50 / 255f, 50 / 255f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        this.game.batch.setProjectionMatrix(this.camera.combined);
-        this.game.batch.begin();
+        this.game.getBatch().setProjectionMatrix(this.camera.combined);
+        this.game.getBatch().begin();
         shapeRenderer.begin();
-        this.renderWidgets(this.game.batch);
-
-
-        // TODO: access to .metris
-//        final float musicSpeed = (float) Math.sqrt(1000f) / (float) Math.sqrt(this.metris.getGravityStrength());
-//        this.getTitleMusic().setPitch(this.getTitleMusicId(), musicSpeed);
+        this.renderWidgets(this.game.getBatch());
 
         shapeRenderer.end();
-        this.game.batch.end();
+        this.game.getBatch().end();
 
         this.stage.act(delta);
         this.stage.draw();
@@ -116,6 +108,7 @@ public class MenuScreen implements Screen {
             widget.setPosition(x, current_y);
             widget.render(batch, shapeRenderer);
         }
+        // FIXME: Vandini....
         font.draw(batch, "Metris", -100, -100); // For some reason the last draw text is not rendered, so we add a dummy text here
     }
 
@@ -145,33 +138,33 @@ public class MenuScreen implements Screen {
     }
 
     public void nextFocussedWidget() {
-        focussedWidget++;
-        if (focussedWidget >= widgets.size()) {
-            focussedWidget = 0;
+        this.focusedWidget++;
+        if (this.focusedWidget >= this.widgets.size()) {
+            this.focusedWidget = 0;
         }
-//        Metris.getLogger().info("Focussed: " + this.focussedWidget);
+       Metris.getLogger().debug("Next focused: " + this.focusedWidget);
     }
 
     public void previousFocussedWidget() {
-        focussedWidget--;
-        if (focussedWidget < 0) {
-            focussedWidget = widgets.size() - 1;
+        this.focusedWidget--;
+        if (this.focusedWidget < 0) {
+            this.focusedWidget = widgets.size() - 1;
         }
-//        Metris.getLogger().info("Focussed: " + this.focussedWidget);
+       Metris.getLogger().debug("Previous focused: " + this.focusedWidget);
     }
 
     public void enterFocussedWidget() {
-        if (focussedWidget >= 0 && focussedWidget < widgets.size()) {
-            widgets.get(focussedWidget).click();
+        if (this.focusedWidget >= 0 && this.focusedWidget < this.widgets.size()) {
+            widgets.get(this.focusedWidget).click();
         }
     }
 
     public void setFocussedWidget(int j) {
-        if (j >= 0 && j < widgets.size()) {
-            this.focussedWidget = j;
+        if (j >= 0 && j < this.widgets.size()) {
+            this.focusedWidget = j;
         } else {
-            Metris.getLogger().warn("Tried to set focussed widget to " + j + ", but only " + widgets.size() + " widgets are available.");
+            Metris.getLogger().warn("Tried to set focussed widget to {}, but only {} widgets are available.", j, widgets.size());
         }
-//        Metris.getLogger().info("Focussed: " + this.focussedWidget);
+       Metris.getLogger().debug("Focused: " + this.focusedWidget);
     }
 }
