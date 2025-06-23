@@ -49,13 +49,14 @@ public class RenderableGame extends Game {
     }
 
     public void render(Batch batch) {
-        // Render field.
+        // Render background
+        batch.draw(this.resources.getBackground(), this.gridOff.getX(), this.gridOff.getY());
+
+        // Render previously placed tiles
         for (int y = 0; y < Field.MAX_VISIBLE_HEIGHT; ++y) {
             for (int x = 0; x < Field.MAX_WIDTH; ++x) {
                 Color color = this.field.getColors()[y][x];
-                batch.draw(this.resources.getUnit(), this.gridOff.getX() + (FIELD_RENDER_UNIT * x), this.gridOff.getY() + (FIELD_RENDER_UNIT * y));
                 if (color.isVisible()) {
-
                     int[] inp = new int[8];
                     for (int i = 0; i < 8; i++) {
                         inp[i] = 0;
@@ -95,17 +96,17 @@ public class RenderableGame extends Game {
 
                     int index = TEXTURE_LOOKUP[result];
 
-//                    Metris.getLogger().info("{} {} {}", inp, result, index);
+                    // Metris.getLogger().info("{} {} {}", inp, result, index);
 
                     batch.draw(this.resources.getTile(color, index), this.gridOff.getX() + (FIELD_RENDER_UNIT * x), this.gridOff.getY() + (FIELD_RENDER_UNIT * y));
                 }
             }
         }
 
-        // Render current tetromino.
-        this.renderTetromino(batch, this.getCurrentTetromino(), this.pixelPos(this.getPosition()));
         // Render ghost of current tetromino.
         this.renderTetromino(batch, this.getCurrentTetromino(), this.pixelPos(this.getHardDropPosition()), true);
+        // Render current tetromino.
+        this.renderTetromino(batch, this.getCurrentTetromino(), this.pixelPos(this.getPosition()));
 
         // Render upcoming tetrominos.
         Tetromino[] preview = this.getNextTetrominos(NEXT_TETROMINOS);
@@ -133,37 +134,35 @@ public class RenderableGame extends Game {
 
     public void renderTetromino(Batch batch, Tetromino toRender, Vec2i position, boolean ghost) {
         TextureRegion texture;
-        if (ghost) {
-            texture = this.resources.getGhostColor(toRender.getColor());
-            for (Vec2i tile : toRender.getShape().getTiles()) {
-                batch.draw(texture, position.getX() + (FIELD_RENDER_UNIT * tile.getX()), position.getY() + (FIELD_RENDER_UNIT * tile.getY()));
+        Shape s = toRender.getShape();
+        Vec2i[] cords = s.getTiles();
+        for (Vec2i tile : toRender.getShape().getTiles()) {
+            int[] inp = new int[8];
+            for (int i = 0; i < 8; i++) {
+                inp[i] = 0;
             }
-        } else {
-            Shape s = toRender.getShape();
-            Vec2i[] cords = s.getTiles();
-            for (Vec2i tile : toRender.getShape().getTiles()) {
-                int[] inp = new int[8];
-                for (int i = 0; i < 8; i++) {
-                    inp[i] = 0;
-                }
-                for (int i = 0; i < 4; i ++) {
-                    if(cords[i].getX() == tile.getX()-1 && cords[i].getY() == tile.getY()+1) inp[0] = 1;
-                    if(cords[i].getX() == tile.getX() && cords[i].getY() == tile.getY()+1) inp[1] = 1;
-                    if(cords[i].getX() == tile.getX()+1 && cords[i].getY() == tile.getY()+1) inp[2] = 1;
-                    if(cords[i].getX() == tile.getX()+1 && cords[i].getY() == tile.getY()) inp[3] = 1;
-                    if(cords[i].getX() == tile.getX()+1 && cords[i].getY() == tile.getY()-1) inp[4] = 1;
-                    if(cords[i].getX() == tile.getX() && cords[i].getY() == tile.getY()-1) inp[5] = 1;
-                    if(cords[i].getX() == tile.getX()-1 && cords[i].getY() == tile.getY()-1) inp[6] = 1;
-                    if(cords[i].getX() == tile.getX()-1 && cords[i].getY() == tile.getY()) inp[7] = 1;
-                }
-                int result = 0;
-                for (int i = 0; i < 8; i++) {
-                    result = (result << 1) | inp[i];
-                }
-                int index = TEXTURE_LOOKUP[result];
+            for (int i = 0; i < 4; i ++) {
+                if(cords[i].getX() == tile.getX()-1 && cords[i].getY() == tile.getY()+1) inp[0] = 1;
+                if(cords[i].getX() == tile.getX() && cords[i].getY() == tile.getY()+1) inp[1] = 1;
+                if(cords[i].getX() == tile.getX()+1 && cords[i].getY() == tile.getY()+1) inp[2] = 1;
+                if(cords[i].getX() == tile.getX()+1 && cords[i].getY() == tile.getY()) inp[3] = 1;
+                if(cords[i].getX() == tile.getX()+1 && cords[i].getY() == tile.getY()-1) inp[4] = 1;
+                if(cords[i].getX() == tile.getX() && cords[i].getY() == tile.getY()-1) inp[5] = 1;
+                if(cords[i].getX() == tile.getX()-1 && cords[i].getY() == tile.getY()-1) inp[6] = 1;
+                if(cords[i].getX() == tile.getX()-1 && cords[i].getY() == tile.getY()) inp[7] = 1;
+            }
+            int result = 0;
+            for (int i = 0; i < 8; i++) {
+                result = (result << 1) | inp[i];
+            }
+            int index = TEXTURE_LOOKUP[result];
+            if(ghost) {
+                texture = this.resources.getGhost(toRender.getColor(), index);
+            }
+            else {
                 texture = this.resources.getTile(toRender.getColor(), index);
-                batch.draw(texture, position.getX() + (FIELD_RENDER_UNIT * tile.getX()), position.getY() + (FIELD_RENDER_UNIT * tile.getY()));
             }
+            batch.draw(texture, position.getX() + (FIELD_RENDER_UNIT * tile.getX()), position.getY() + (FIELD_RENDER_UNIT * tile.getY()));
         }
     }
 

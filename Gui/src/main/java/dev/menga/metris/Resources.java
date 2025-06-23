@@ -13,37 +13,41 @@ import lombok.Getter;
 public class Resources implements Disposable {
 
     private final AssetManager assetManager = new AssetManager();
-    private final TextureAtlas atlas;
     private final TextureAtlas tileAtlas;
+    private final TextureAtlas ghostAtlas;
+    private final TextureAtlas backgroundAtlas;
 
     @Getter
-    final private TextureRegion unit;
-    final private TextureRegion[] colorTextures;
-    final private TextureRegion[] ghostColorTextures;
     final private TextureRegion[][] tileTextures;
+    final private TextureRegion[][] ghostTextures;
+    final private TextureRegion backgroundTexture;
+
     Resources() {
         this.assetManager.load("textures.atlas", TextureAtlas.class);
         this.assetManager.load("tiles.atlas", TextureAtlas.class);
-
+        this.assetManager.load("ghosts.atlas", TextureAtlas.class);
+        this.assetManager.load("background.atlas", TextureAtlas.class);
         this.assetManager.finishLoading();
-        this.atlas = assetManager.get("textures.atlas", TextureAtlas.class);
-        this.tileAtlas = assetManager.get("tiles.atlas", TextureAtlas.class);
-        this.colorTextures = this.atlas.findRegion("colors").split(32, 32)[0];
-        this.tileTextures = this.tileAtlas.findRegion("everything").split(32, 32);
-        this.ghostColorTextures = this.atlas.findRegion("colors").split(32, 32)[1];
-        this.unit = this.atlas.findRegion("unit");
-    }
 
-    public TextureRegion getTexture(String texture) {
-        return atlas.findRegion(texture);
+        this.tileAtlas = assetManager.get("tiles.atlas", TextureAtlas.class);
+        this.ghostAtlas = assetManager.get("ghosts.atlas", TextureAtlas.class);
+        this.backgroundAtlas = assetManager.get("background.atlas", TextureAtlas.class);
+
+        this.tileTextures = this.tileAtlas.findRegion("everything").split(32, 32);
+        this.ghostTextures = this.ghostAtlas.findRegion("everything").split(32, 32);
+        this.backgroundTexture = this.backgroundAtlas.findRegion("everything").split(320, 640)[0][0];
     }
 
     public TextureRegion getTile(Color color, int index) {
         return this.tileTextures[color.getId()-2][index];
     }
 
-    public TextureRegion getGhostColor(Color color) {
-        return this.ghostColorTextures[color.getId()];
+    public TextureRegion getGhost(Color color, int index) {
+        return this.ghostTextures[color.getId()-2][index];
+    }
+
+    public TextureRegion getBackground() {
+        return this.backgroundTexture;
     }
 
     public BitmapFont getDefaultFont() {
@@ -53,6 +57,8 @@ public class Resources implements Disposable {
     @Override
     public void dispose() {
         this.assetManager.dispose();
-        this.atlas.dispose();
+        this.tileAtlas.dispose();
+        this.ghostAtlas.dispose();
+        this.backgroundAtlas.dispose();
     }
 }
