@@ -36,6 +36,10 @@ public class SingleplayerGameScreen extends GameScreen {
     @Getter
     long bgmId;
 
+    // TODO: Should be in RenderableGame with configurable offsets.
+    private Label scoreLabel;
+    private Label levelLabel;
+
     @Override
     public void present() {
         // Setup music
@@ -54,6 +58,19 @@ public class SingleplayerGameScreen extends GameScreen {
                 this.randomFieldColors[y][x] = visibleColors[rand.nextInt(visibleColors.length)];
             }
         }
+
+        LabelStyle labelStyle = new LabelStyle(this.getGui().getResources().getDefaultFont(), com.badlogic.gdx.graphics.Color.WHITE);
+        this.scoreLabel = new Label("Score: 0", labelStyle);
+        this.levelLabel = new Label("Level: 0", labelStyle);
+
+        this.scoreLabel.setFontScale(2f);
+        this.levelLabel.setFontScale(2f);
+
+        this.scoreLabel.setPosition(20, 750);
+        this.levelLabel.setPosition(20, 700);
+
+        this.stage.addActor(this.scoreLabel);
+        this.stage.addActor(this.levelLabel);
     }
 
     @Override
@@ -69,6 +86,10 @@ public class SingleplayerGameScreen extends GameScreen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         this.metris.render(this.getGui().getBatch());
+
+        // Update score and level labels
+        this.scoreLabel.setText("Score: " + this.metris.getScore());
+        this.levelLabel.setText("Level: " + this.metris.getLevel());
 
         if (this.metris.isGameOver()) {
             if (!gameOverHandled) {
