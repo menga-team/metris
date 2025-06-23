@@ -36,6 +36,7 @@ public abstract class Game {
     Queue<Tetromino> bagA = null;
     Queue<Tetromino> bagB = null;
 
+    @Getter
     long elapsed = 0;
     long gravityTimer = 0;
 
@@ -261,8 +262,7 @@ public abstract class Game {
         this.elapsed += delta;
         this.gravityTimer += delta;
 
-        // TODO: Bad formula
-        this.gravityStrength = 1000 - (50 * this.getLinesCleared());
+        this.gravityStrength = 1000 - ((int) this.getElapsed() / 2000);
 
         if (this.gravityTimer >= this.gravityStrength) {
             this.gravityTimer -= this.gravityStrength;

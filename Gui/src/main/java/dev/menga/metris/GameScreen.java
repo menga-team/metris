@@ -86,8 +86,8 @@ public class GameScreen implements Screen {
         this.game.batch.begin();
         this.metris.render(this.game.batch);
 
-//        final float musicSpeed = 1000f / this.metris.getGravityStrength();
-//        this.getMainMusic().setPitch(this.getBgmId(), musicSpeed);
+        final float musicSpeed = (float) Math.sqrt(1000f) / (float) Math.sqrt(this.metris.getGravityStrength());
+        this.getMainMusic().setPitch(this.getBgmId(), musicSpeed);
 
         this.game.batch.end();
 
