@@ -56,50 +56,41 @@ public class RenderableGame extends Game {
         for (int y = 0; y < Field.MAX_VISIBLE_HEIGHT; ++y) {
             for (int x = 0; x < Field.MAX_WIDTH; ++x) {
                 Color color = this.field.getColors()[y][x];
-                if (color.isVisible()) {
-                    int[] inp = new int[8];
-                    for (int i = 0; i < 8; i++) {
-                        inp[i] = 0;
-                    }
-                    int ly = this.field.MAX_VISIBLE_HEIGHT-1;
-                    int lx = this.field.MAX_WIDTH-1;
+                if (!color.isVisible()) continue;
 
-                    if (x > 0 && y < ly && this.field.getAt(Vec2i.of(x - 1, y + 1)).equals(color)) {
-                        inp[0] = 1;
-                    }
-                    if (y < ly && this.field.getAt(Vec2i.of(x, y + 1)).equals(color)) {
-                        inp[1] = 1;
-                    }
-                    if (x < lx && y < ly && this.field.getAt(Vec2i.of(x + 1, y + 1)).equals(color)) {
-                        inp[2] = 1;
-                    }
-                    if (x < lx && this.field.getAt(Vec2i.of(x + 1, y)).equals(color)) {
-                        inp[3] = 1;
-                    }
-                    if (x < lx && y > 0 && this.field.getAt(Vec2i.of(x + 1, y - 1)).equals(color)) {
-                        inp[4] = 1;
-                    }
-                    if (y > 0 && this.field.getAt(Vec2i.of(x, y - 1)).equals(color)) {
-                        inp[5] = 1;
-                    }
-                    if (x > 0 && y > 0 && this.field.getAt(Vec2i.of(x - 1, y - 1)).equals(color)) {
-                        inp[6] = 1;
-                    }
-                    if (x > 0 && this.field.getAt(Vec2i.of(x - 1, y)).equals(color)) {
-                        inp[7] = 1;
-                    }
+                int result = 0;
 
-                    int result = 0;
-                    for (int i = 0; i < 8; i++) {
-                        result = (result << 1) | inp[i];
-                    }
+                int ly = this.field.MAX_VISIBLE_HEIGHT-1;
+                int lx = this.field.MAX_WIDTH-1;
 
-                    int index = TEXTURE_LOOKUP[result];
-
-                    // Metris.getLogger().info("{} {} {}", inp, result, index);
-
-                    batch.draw(this.resources.getTile(color, index), this.gridOff.getX() + (FIELD_RENDER_UNIT * x), this.gridOff.getY() + (FIELD_RENDER_UNIT * y));
+                if (x > 0 && y < ly && this.field.getAt(Vec2i.of(x - 1, y + 1)) == color) {
+                    result |= 1 << 7;
                 }
+                if (y < ly && this.field.getAt(Vec2i.of(x, y + 1)) == color) {
+                    result |= 1 << 6;
+                }
+                if (x < lx && y < ly && this.field.getAt(Vec2i.of(x + 1, y + 1)) == color) {
+                    result |= 1 << 5;
+                }
+                if (x < lx && this.field.getAt(Vec2i.of(x + 1, y)).equals(color)) {
+                    result |= 1 << 4;
+                }
+                if (x < lx && y > 0 && this.field.getAt(Vec2i.of(x + 1, y - 1)) == color) {
+                    result |= 1 << 3;
+                }
+                if (y > 0 && this.field.getAt(Vec2i.of(x, y - 1)).equals(color)) {
+                    result |= 1 << 2;
+                }
+                if (x > 0 && y > 0 && this.field.getAt(Vec2i.of(x - 1, y - 1)) == color) {
+                    result |= 1 << 1;
+                }
+                if (x > 0 && this.field.getAt(Vec2i.of(x - 1, y)) == color) {
+                    result |= 1 << 0;
+                }
+
+                int index = TEXTURE_LOOKUP[result];
+
+                batch.draw(this.resources.getTile(color, index), this.gridOff.getX() + (FIELD_RENDER_UNIT * x), this.gridOff.getY() + (FIELD_RENDER_UNIT * y));
             }
         }
 
@@ -137,24 +128,19 @@ public class RenderableGame extends Game {
         Shape s = toRender.getShape();
         Vec2i[] cords = s.getTiles();
         for (Vec2i tile : toRender.getShape().getTiles()) {
-            int[] inp = new int[8];
-            for (int i = 0; i < 8; i++) {
-                inp[i] = 0;
-            }
-            for (int i = 0; i < 4; i ++) {
-                if(cords[i].getX() == tile.getX()-1 && cords[i].getY() == tile.getY()+1) inp[0] = 1;
-                if(cords[i].getX() == tile.getX() && cords[i].getY() == tile.getY()+1) inp[1] = 1;
-                if(cords[i].getX() == tile.getX()+1 && cords[i].getY() == tile.getY()+1) inp[2] = 1;
-                if(cords[i].getX() == tile.getX()+1 && cords[i].getY() == tile.getY()) inp[3] = 1;
-                if(cords[i].getX() == tile.getX()+1 && cords[i].getY() == tile.getY()-1) inp[4] = 1;
-                if(cords[i].getX() == tile.getX() && cords[i].getY() == tile.getY()-1) inp[5] = 1;
-                if(cords[i].getX() == tile.getX()-1 && cords[i].getY() == tile.getY()-1) inp[6] = 1;
-                if(cords[i].getX() == tile.getX()-1 && cords[i].getY() == tile.getY()) inp[7] = 1;
-            }
             int result = 0;
-            for (int i = 0; i < 8; i++) {
-                result = (result << 1) | inp[i];
+
+            for (int i = 0; i < 4; i ++) {
+                if (cords[i].getX() == tile.getX()-1 && cords[i].getY() == tile.getY()+1) result |= 1 << 7;
+                if (cords[i].getX() == tile.getX()   && cords[i].getY() == tile.getY()+1) result |= 1 << 6;
+                if (cords[i].getX() == tile.getX()+1 && cords[i].getY() == tile.getY()+1) result |= 1 << 5;
+                if (cords[i].getX() == tile.getX()+1 && cords[i].getY() == tile.getY()  ) result |= 1 << 4;
+                if (cords[i].getX() == tile.getX()+1 && cords[i].getY() == tile.getY()-1) result |= 1 << 3;
+                if (cords[i].getX() == tile.getX()   && cords[i].getY() == tile.getY()-1) result |= 1 << 2;
+                if (cords[i].getX() == tile.getX()-1 && cords[i].getY() == tile.getY()-1) result |= 1 << 1;
+                if (cords[i].getX() == tile.getX()-1 && cords[i].getY() == tile.getY()  ) result |= 1 << 0;
             }
+
             int index = TEXTURE_LOOKUP[result];
             if(ghost) {
                 texture = this.resources.getGhost(toRender.getColor(), index);
