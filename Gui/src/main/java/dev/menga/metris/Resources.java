@@ -23,7 +23,6 @@ public class Resources implements Disposable {
     final private TextureRegion backgroundTexture;
 
     Resources() {
-        this.assetManager.load("textures.atlas", TextureAtlas.class);
         this.assetManager.load("tiles.atlas", TextureAtlas.class);
         this.assetManager.load("ghosts.atlas", TextureAtlas.class);
         this.assetManager.load("background.atlas", TextureAtlas.class);
@@ -39,11 +38,11 @@ public class Resources implements Disposable {
     }
 
     public TextureRegion getTile(Color color, int index) {
-        return this.tileTextures[color.getId()-2][index];
+        return this.tileTextures[color.getId() - 2][index];
     }
 
     public TextureRegion getGhost(Color color, int index) {
-        return this.ghostTextures[color.getId()-2][index];
+        return this.ghostTextures[color.getId() - 2][index];
     }
 
     public TextureRegion getBackground() {

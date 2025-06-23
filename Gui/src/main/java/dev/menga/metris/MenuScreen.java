@@ -38,6 +38,7 @@ public class MenuScreen implements Screen {
     private Camera camera = new OrthographicCamera(800, 800);
     private Viewport viewport = new ExtendViewport(800, 800, camera);
     private MenuInputHandler MenuInputHandler;
+    //    private RenderableGame metris;
     private Stage stage;
 
     private final ShapeRenderer shapeRenderer = new ShapeRenderer();
@@ -93,9 +94,10 @@ public class MenuScreen implements Screen {
         shapeRenderer.begin();
         this.renderWidgets(this.game.batch);
 
-//        final float musicSpeed = 1000f / this.metris.getGravityStrength();
-//        this.getTitleMusic().setPitch(this.getTitleMusicId(), musicSpeed);
 
+        // TODO: access to .metris
+//        final float musicSpeed = (float) Math.sqrt(1000f) / (float) Math.sqrt(this.metris.getGravityStrength());
+//        this.getTitleMusic().setPitch(this.getTitleMusicId(), musicSpeed);
 
         shapeRenderer.end();
         this.game.batch.end();
