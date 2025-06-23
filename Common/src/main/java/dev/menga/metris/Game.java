@@ -2,6 +2,8 @@ package dev.menga.metris;
 
 import java.util.*;
 
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.backends.lwjgl3.audio.Mp3;
 import dev.menga.metris.utils.Vec2i;
 import lombok.Getter;
 
@@ -32,6 +34,12 @@ public abstract class Game {
 
     @Getter
     int linesCleared = 0;
+
+    @Getter
+    int score = 0;
+
+    @Getter
+    int level = 0;
 
     Queue<Tetromino> bagA = null;
     Queue<Tetromino> bagB = null;
@@ -96,8 +104,7 @@ public abstract class Game {
         Vec2i[] tiles = tet.getShape().getTiles();
         for (int i = 0; i < tiles.length; ++i) {
             Vec2i testPos = coords.add(tiles[i]);
-            if (!(testPos.getY() >= 0 && testPos.getY() < Field.MAX_HEIGHT &&
-                  testPos.getX() >= 0 && testPos.getX() < Field.MAX_WIDTH)) {
+            if (!(testPos.getY() >= 0 && testPos.getY() < Field.MAX_HEIGHT && testPos.getX() >= 0 && testPos.getX() < Field.MAX_WIDTH)) {
                 return false;
             }
             if (this.getField().getAt(testPos).isVisible()) {
@@ -184,12 +191,30 @@ public abstract class Game {
     }
 
     public void clearLines() {
+        int linesThisTurn = 0;
         for (int i = Field.MAX_HEIGHT - 1; i >= 0; --i) {
             if (this.field.isLineFull(i)) {
                 this.field.moveLinesDown(i + 1);
                 this.linesCleared++;
+                linesThisTurn++;
+                i++; // recheck this line after moving down
             }
         }
+        if (linesThisTurn > 0) {
+            this.addScore(linesThisTurn);
+            this.updateLevel();
+        }
+    }
+
+    private void addScore(int lines) {
+        int[] points = {0, 40, 100, 300, 1200};
+        if (lines >= 1 && lines <= 4) {
+            this.score += points[lines] * (this.level + 1);
+        }
+    }
+
+    private void updateLevel() {
+        this.level = this.linesCleared / 10;
     }
 
     public boolean rotate(Rotation rot) {
@@ -220,13 +245,7 @@ public abstract class Game {
         }
         this.currentTetromino.setRotation(rot);
 
-        Vec2i[] tests = {
-            offsetData[currentRot.getIndex()][0].sub(offsetData[rot.getIndex()][0]),
-            offsetData[currentRot.getIndex()][1].sub(offsetData[rot.getIndex()][1]),
-            offsetData[currentRot.getIndex()][2].sub(offsetData[rot.getIndex()][2]),
-            offsetData[currentRot.getIndex()][3].sub(offsetData[rot.getIndex()][3]),
-            offsetData[currentRot.getIndex()][4].sub(offsetData[rot.getIndex()][4]),
-        };
+        Vec2i[] tests = {offsetData[currentRot.getIndex()][0].sub(offsetData[rot.getIndex()][0]), offsetData[currentRot.getIndex()][1].sub(offsetData[rot.getIndex()][1]), offsetData[currentRot.getIndex()][2].sub(offsetData[rot.getIndex()][2]), offsetData[currentRot.getIndex()][3].sub(offsetData[rot.getIndex()][3]), offsetData[currentRot.getIndex()][4].sub(offsetData[rot.getIndex()][4]),};
 
         int kick = 0;
         boolean fits = false;

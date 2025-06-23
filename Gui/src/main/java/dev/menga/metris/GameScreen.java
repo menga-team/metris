@@ -42,6 +42,9 @@ public class GameScreen implements Screen {
     @Getter
     long bgmId;
 
+    private Label scoreLabel;
+    private Label levelLabel;
+
     @Override
     public void show() {
         this.metris = new RenderableGame(this.game.resources, Vec2i.of(160, 0), Vec2i.of(546, 160), Vec2i.of(60, 560));
@@ -66,6 +69,19 @@ public class GameScreen implements Screen {
                 this.randomFieldColors[y][x] = visibleColors[rand.nextInt(visibleColors.length)];
             }
         }
+
+        LabelStyle labelStyle = new LabelStyle(this.game.resources.getDefaultFont(), com.badlogic.gdx.graphics.Color.WHITE);
+        this.scoreLabel = new Label("Score: 0", labelStyle);
+        this.levelLabel = new Label("Level: 0", labelStyle);
+
+        this.scoreLabel.setFontScale(2f);
+        this.levelLabel.setFontScale(2f);
+
+        this.scoreLabel.setPosition(20, 750);
+        this.levelLabel.setPosition(20, 700);
+
+        this.stage.addActor(this.scoreLabel);
+        this.stage.addActor(this.levelLabel);
     }
 
     @Override
@@ -93,6 +109,10 @@ public class GameScreen implements Screen {
 
         this.stage.act(delta);
         this.stage.draw();
+
+        // Update score and level labels
+        this.scoreLabel.setText("Score: " + this.metris.getScore());
+        this.levelLabel.setText("Level: " + this.metris.getLevel());
 
         if (this.metris.isGameOver()) {
             if (!gameOverHandled) {
