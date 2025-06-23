@@ -130,7 +130,7 @@ public class RenderableGame extends Game {
         for (Vec2i tile : toRender.getShape().getTiles()) {
             int result = 0;
 
-            for (int i = 0; i < 4; i ++) {
+            for (int i = 0; i < cords.length; i ++) {
                 if (cords[i].getX() == tile.getX()-1 && cords[i].getY() == tile.getY()+1) result |= 1 << 7;
                 if (cords[i].getX() == tile.getX()   && cords[i].getY() == tile.getY()+1) result |= 1 << 6;
                 if (cords[i].getX() == tile.getX()+1 && cords[i].getY() == tile.getY()+1) result |= 1 << 5;
