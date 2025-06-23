@@ -95,7 +95,7 @@ public class RenderableGame extends Game {
 
                     int index = TEXTURE_LOOKUP[result];
 
-                    Metris.getLogger().info("{} {} {}", inp, result, index);
+//                    Metris.getLogger().info("{} {} {}", inp, result, index);
 
                     batch.draw(this.resources.getTile(color, index), this.gridOff.getX() + (FIELD_RENDER_UNIT * x), this.gridOff.getY() + (FIELD_RENDER_UNIT * y));
                 }
@@ -135,12 +135,35 @@ public class RenderableGame extends Game {
         TextureRegion texture;
         if (ghost) {
             texture = this.resources.getGhostColor(toRender.getColor());
+            for (Vec2i tile : toRender.getShape().getTiles()) {
+                batch.draw(texture, position.getX() + (FIELD_RENDER_UNIT * tile.getX()), position.getY() + (FIELD_RENDER_UNIT * tile.getY()));
+            }
         } else {
-            texture = this.resources.getTile(toRender.getColor(), 0);
-        }
-
-        for (Vec2i tile : toRender.getShape().getTiles()) {
-            batch.draw(texture, position.getX() + (FIELD_RENDER_UNIT * tile.getX()), position.getY() + (FIELD_RENDER_UNIT * tile.getY()));
+            Shape s = toRender.getShape();
+            Vec2i[] cords = s.getTiles();
+            for (Vec2i tile : toRender.getShape().getTiles()) {
+                int[] inp = new int[8];
+                for (int i = 0; i < 8; i++) {
+                    inp[i] = 0;
+                }
+                for (int i = 0; i < 4; i ++) {
+                    if(cords[i].getX() == tile.getX()-1 && cords[i].getY() == tile.getY()+1) inp[0] = 1;
+                    if(cords[i].getX() == tile.getX() && cords[i].getY() == tile.getY()+1) inp[1] = 1;
+                    if(cords[i].getX() == tile.getX()+1 && cords[i].getY() == tile.getY()+1) inp[2] = 1;
+                    if(cords[i].getX() == tile.getX()+1 && cords[i].getY() == tile.getY()) inp[3] = 1;
+                    if(cords[i].getX() == tile.getX()+1 && cords[i].getY() == tile.getY()-1) inp[4] = 1;
+                    if(cords[i].getX() == tile.getX() && cords[i].getY() == tile.getY()-1) inp[5] = 1;
+                    if(cords[i].getX() == tile.getX()-1 && cords[i].getY() == tile.getY()-1) inp[6] = 1;
+                    if(cords[i].getX() == tile.getX()-1 && cords[i].getY() == tile.getY()) inp[7] = 1;
+                }
+                int result = 0;
+                for (int i = 0; i < 8; i++) {
+                    result = (result << 1) | inp[i];
+                }
+                int index = TEXTURE_LOOKUP[result];
+                texture = this.resources.getTile(toRender.getColor(), index);
+                batch.draw(texture, position.getX() + (FIELD_RENDER_UNIT * tile.getX()), position.getY() + (FIELD_RENDER_UNIT * tile.getY()));
+            }
         }
     }
 
