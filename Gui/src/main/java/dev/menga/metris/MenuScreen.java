@@ -1,7 +1,9 @@
 package dev.menga.metris;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -40,7 +42,14 @@ public class MenuScreen implements Screen {
 
     private final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
-    MenuScreen(MetrisGuiGame game) {
+    @Getter
+    Sound titleMusic;
+
+    @Getter
+    long titleMusicId;
+
+
+    public MenuScreen(MetrisGuiGame game) {
         this.game = game;
     }
 
@@ -51,6 +60,13 @@ public class MenuScreen implements Screen {
         this.stage = new Stage(this.viewport, this.game.batch);
         Gdx.input.setInputProcessor(this.MenuInputHandler);
         this.font = new BitmapFont();
+
+//        Setup music
+        // TODO: Fix long starting/loading time -> compress the music file ig?
+        this.titleMusic = Gdx.audio.newSound(Gdx.files.internal("titleMusic.mp3"));
+        this.titleMusicId = this.titleMusic.play(1f);
+        this.titleMusic.setLooping(this.getTitleMusicId(), true);
+        this.titleMusic.setPitch(this.getTitleMusicId(), 1f);
     }
 
     public void setWidgets(ArrayList<Widget> widgets) {
@@ -76,6 +92,11 @@ public class MenuScreen implements Screen {
         this.game.batch.begin();
         shapeRenderer.begin();
         this.renderWidgets(this.game.batch);
+
+//        final float musicSpeed = 1000f / this.metris.getGravityStrength();
+//        this.getTitleMusic().setPitch(this.getTitleMusicId(), musicSpeed);
+
+
         shapeRenderer.end();
         this.game.batch.end();
 

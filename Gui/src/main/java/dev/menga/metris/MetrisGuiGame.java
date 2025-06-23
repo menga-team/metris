@@ -18,6 +18,7 @@ public class MetrisGuiGame extends Game {
     Resources resources;
 
     private MenuScreen screen;
+    private RenderableGame metris;
 
     @Override
     public void create() {
@@ -26,11 +27,17 @@ public class MetrisGuiGame extends Game {
         this.screen = new MenuScreen(this);
         this.setScreen(this.screen);
 
-        ArrayList<Widget> menuWidgetList = new ArrayList(){
+        ArrayList<Widget> menuWidgetList = new ArrayList() {
             {
                 add(new ImageWidget(screen, new Texture(Gdx.files.internal("menutitle.png"))));
                 add(new MenuButton(screen, "Start Game", () -> {
                     Metris.getLogger().info("Starting game...");
+
+                    // TODO: isch des richtig do?
+                    screen.getTitleMusic().stop();
+                    //
+
+
                     screen.getGame().setScreen(new GameScreen(screen.getGame()));
                 }));
                 add(new MenuButton(screen, "Multiplayer", () -> {

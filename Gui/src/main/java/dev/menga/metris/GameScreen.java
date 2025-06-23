@@ -13,7 +13,6 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import dev.menga.metris.utils.Vec2i;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -34,11 +33,14 @@ public class GameScreen implements Screen {
     private RenderableGame metris;
     private Stage stage;
     private final Color[][] randomFieldColors = new Color[Field.MAX_VISIBLE_HEIGHT][Field.MAX_WIDTH];
+    private boolean gameOverHandled = false;
 
     @Getter
-    private Sound sound;
+    Sound mainMusic;
     @Getter
-    private long bgmId;
+    Sound gameOverSound;
+    @Getter
+    long bgmId;
 
     @Override
     public void show() {
@@ -48,10 +50,13 @@ public class GameScreen implements Screen {
         Gdx.input.setInputProcessor(this.inputHandler);
 
         // Setup music
-        this.sound = Gdx.audio.newSound(Gdx.files.internal("simabito.ogg"));
-        this.bgmId = this.sound.play(1f);
-        this.sound.setLooping(this.getBgmId(), true);
-        this.sound.setPitch(this.getBgmId(), 1f);
+
+        this.mainMusic = Gdx.audio.newSound(Gdx.files.internal("simabito.ogg"));
+        this.bgmId = this.mainMusic.play(1f);
+        this.mainMusic.setLooping(this.getBgmId(), true);
+        this.mainMusic.setPitch(this.getBgmId(), 1f);
+
+        this.gameOverSound = Gdx.audio.newSound(Gdx.files.internal("death.mp3"));
 
         // Generate random field colors for game over
         Random rand = new Random();
@@ -80,15 +85,27 @@ public class GameScreen implements Screen {
         this.game.batch.setProjectionMatrix(this.camera.combined);
         this.game.batch.begin();
         this.metris.render(this.game.batch);
-        final float musicSpeed = 1000f / this.metris.getGravityStrength();
-        this.getSound().setPitch(this.getBgmId(), musicSpeed);
+
+//        final float musicSpeed = 1000f / this.metris.getGravityStrength();
+//        this.getMainMusic().setPitch(this.getBgmId(), musicSpeed);
+
         this.game.batch.end();
 
         this.stage.act(delta);
         this.stage.draw();
 
         if (this.metris.isGameOver()) {
+            if (!gameOverHandled) {
+                gameOverHandled = true;
+                this.getMainMusic().stop();
+
+                this.bgmId = this.gameOverSound.play(1f);
+                this.gameOverSound.setLooping(this.getBgmId(), false);
+                this.gameOverSound.setPitch(this.getBgmId(), 1f);
+            }
             this.gameOver();
+        } else {
+            gameOverHandled = false;
         }
     }
 
@@ -114,14 +131,13 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-        this.sound.dispose();
+        this.mainMusic.dispose();
         this.stage.dispose();
     }
 
     public void gameOver() {
         // show a game over text on the existing screen
-        LabelStyle labelStyle = new LabelStyle(this.game.resources.getDefaultFont(),
-                                               com.badlogic.gdx.graphics.Color.RED);
+        LabelStyle labelStyle = new LabelStyle(this.game.resources.getDefaultFont(), com.badlogic.gdx.graphics.Color.RED);
 
         Label gameOverLabel = new Label("Game Over", labelStyle);
         gameOverLabel.setFontScale(3f);
@@ -135,7 +151,5 @@ public class GameScreen implements Screen {
         for (int i = 0; i < Field.MAX_VISIBLE_HEIGHT; ++i) {
             System.arraycopy(this.randomFieldColors[i], 0, this.metris.field.getColors()[i], 0, Field.MAX_WIDTH);
         }
-
-        this.getSound().stop();
     }
 }
