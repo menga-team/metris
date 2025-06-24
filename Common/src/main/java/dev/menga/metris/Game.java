@@ -222,6 +222,7 @@ public abstract class Game {
 
         Vec2i[][] offsetData;
         Rotation currentRot = this.getCurrentTetromino().getRotation();
+        this.currentTetromino.setRotation(rot);
         switch (this.getCurrentTetromino().getType()) {
             case TetrominoType.I:
                 offsetData = TetrominoType.OFFSET_DATA_I;
@@ -236,18 +237,22 @@ public abstract class Game {
             case TetrominoType.O:
                 Vec2i kick = TetrominoType.OFFSET_DATA_O[currentRot.getIndex()].sub(TetrominoType.OFFSET_DATA_O[rot.getIndex()]);
                 this.position.addMut(kick);
-                this.currentTetromino.setRotation(rot);
                 return true;
             default:
                 return false;
         }
-        this.currentTetromino.setRotation(rot);
 
-        Vec2i[] tests = {offsetData[currentRot.getIndex()][0].sub(offsetData[rot.getIndex()][0]), offsetData[currentRot.getIndex()][1].sub(offsetData[rot.getIndex()][1]), offsetData[currentRot.getIndex()][2].sub(offsetData[rot.getIndex()][2]), offsetData[currentRot.getIndex()][3].sub(offsetData[rot.getIndex()][3]), offsetData[currentRot.getIndex()][4].sub(offsetData[rot.getIndex()][4]),};
+        Vec2i[] tests = {
+            offsetData[currentRot.getIndex()][0].sub(offsetData[rot.getIndex()][0]),
+            offsetData[currentRot.getIndex()][1].sub(offsetData[rot.getIndex()][1]),
+            offsetData[currentRot.getIndex()][2].sub(offsetData[rot.getIndex()][2]),
+            offsetData[currentRot.getIndex()][3].sub(offsetData[rot.getIndex()][3]),
+            offsetData[currentRot.getIndex()][4].sub(offsetData[rot.getIndex()][4])
+        };
 
         int kick = 0;
         boolean fits = false;
-        for (; kick < 5; ++kick) {
+        for (; kick < tests.length; ++kick) {
             if (this.testPlacement(this.getPosition().add(tests[kick]))) {
                 fits = true;
                 break;

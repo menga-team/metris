@@ -24,11 +24,11 @@ public class Vec2i {
     }
 
     public Vec2i add(Vec2i rhs) {
-        return Vec2i.of(rhs.getX() + this.getX(), rhs.getY() + this.getY());
+        return this.add(rhs.getX(), rhs.getY());
     }
 
     public Vec2i add(int x, int y) {
-        return Vec2i.of(x + this.getX(), y + this.getY());
+        return Vec2i.of(this.getX() + x, this.getY() + y);
     }
 
     public void subMut(Vec2i rhs) {
@@ -37,11 +37,11 @@ public class Vec2i {
     }
 
     public Vec2i sub(Vec2i rhs) {
-        return Vec2i.of(rhs.getX() - this.getX(), rhs.getY() - this.getY());
+        return this.sub(rhs.getX(), rhs.getY());
     }
 
     public Vec2i sub(int x, int y) {
-        return Vec2i.of(x - this.getX(), y - this.getY());
+        return Vec2i.of(this.getX() - x, this.getY() - y);
     }
 
     public void scaleMut(int by) {
