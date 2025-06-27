@@ -58,7 +58,7 @@ and supports both solo play and local multiplayer. The project is modular, separ
 
 ---
 
-# 🛠 Project Structure
+# Project Structure
 
 ```plaintext
 .
@@ -70,7 +70,6 @@ and supports both solo play and local multiplayer. The project is modular, separ
 │   └── src/main/assets/...
 ├── README.md
 ├── pom.xml
-├── PROTOCOL.org
 └── ...
 ```
 
@@ -109,9 +108,8 @@ and supports both solo play and local multiplayer. The project is modular, separ
 
 # Team Experience
 
-> *This project was a deep dive into game architecture, GUI design, and the nuances of Tetris mechanics. We learned to balance classic gameplay with modern
-usability, and to structure code for clarity and extensibility. Challenges included implementing SRS rotation, managing game state transitions, and optimizing
-asset loading for smooth user experience.*
+> *Four computer science students collaborated on Metris, gaining practical experience in teamwork, modular design, and applying theory to a real software
+project.*
 
 ---
 
