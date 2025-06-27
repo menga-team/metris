@@ -108,7 +108,7 @@ public class GameInputHandler implements ActiveInputProcessor {
         case Input.Keys.RIGHT -> this.getGame().moveRight();
         case Input.Keys.LEFT -> this.getGame().moveLeft();
         case Input.Keys.DOWN -> this.getGame().moveDown();
-        case Input.Keys.SPACE -> this.getGame().hardDrop();
+        case Input.Keys.SPACE -> this.getGame().hardDrop(game.isSpacePlacesBlocks());
         case Input.Keys.X -> this.getGame().rotateCW();
         case Input.Keys.Z -> this.getGame().rotateCCW();
         case Input.Keys.C -> this.getGame().holdPiece();

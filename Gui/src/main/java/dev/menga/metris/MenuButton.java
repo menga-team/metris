@@ -16,7 +16,7 @@ import static java.awt.SystemColor.text;
 public class MenuButton extends Widget {
 
     @Getter
-    private String label;
+    private String label = "";
     private GlyphLayout layout;
     private float textWidth;
     private float textHeight;
@@ -32,6 +32,17 @@ public class MenuButton extends Widget {
         this.setMenuScreen(menuScreen);
         this.label = label;
         this.action = action;
+    }
+
+    public MenuButton(MenuScreen menuScreen, String label) {
+        super(menuScreen);
+        this.setMenuScreen(menuScreen);
+        this.label = label;
+    }
+
+    public MenuButton(MenuScreen menuScreen) {
+        super(menuScreen);
+        this.setMenuScreen(menuScreen);
     }
 
     public void show() {
@@ -57,16 +68,16 @@ public class MenuButton extends Widget {
         }
     }
 
-    public void render(Batch batch, ShapeRenderer shapeRenderer) {
+    public void render(Batch batch, ShapeRenderer lineShapeRenderer, ShapeRenderer filledShapeRenderer) {
 
         if (this.isFocussed()) {
-            shapeRenderer.setColor(192/255f, 192/255f, 192/255f, 1);
+            lineShapeRenderer.setColor(192/255f, 192/255f, 192/255f, 1);
         } else {
-            shapeRenderer.setColor(128/255f, 128/255f, 128/255f, 1);
+            lineShapeRenderer.setColor(128/255f, 128/255f, 128/255f, 1);
         }
         if (font != null) {
             font.draw(batch, label, this.getX() + (this.getWidth() / 2) - (this.textWidth / 2), this.getY() + (this.getHeight() / 2) + (this.textHeight / 2));
         }
-        shapeRenderer.rect(getX(), getY(), getWidth(), getHeight());
+        lineShapeRenderer.rect(getX(), getY(), getWidth(), getHeight());
     }
 }

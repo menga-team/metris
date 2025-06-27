@@ -38,7 +38,8 @@ public class MenuScreen implements Screen {
     private final Viewport viewport = new ExtendViewport(800, 800, camera);
     private Stage stage;
 
-    private final ShapeRenderer shapeRenderer = new ShapeRenderer();
+    private final ShapeRenderer lineShapeRenderer = new ShapeRenderer();
+    private final ShapeRenderer filledShapeRenderer = new ShapeRenderer();
 
     @Getter
     Sound titleMusic;
@@ -54,7 +55,8 @@ public class MenuScreen implements Screen {
     @Override
     public void show() {
         MenuInputHandler menuInputHandler = new MenuInputHandler(this);
-        shapeRenderer.setAutoShapeType(true);
+        lineShapeRenderer.setAutoShapeType(true);
+        filledShapeRenderer.setAutoShapeType(true);
         this.stage = new Stage(this.viewport, this.game.getBatch());
         Gdx.input.setInputProcessor(menuInputHandler);
         this.font = new BitmapFont();
@@ -88,10 +90,12 @@ public class MenuScreen implements Screen {
 
         this.game.getBatch().setProjectionMatrix(this.camera.combined);
         this.game.getBatch().begin();
-        shapeRenderer.begin();
+        lineShapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        filledShapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         this.renderWidgets(this.game.getBatch());
 
-        shapeRenderer.end();
+        lineShapeRenderer.end();
+        filledShapeRenderer.end();
         this.game.getBatch().end();
 
         this.stage.act(delta);
@@ -106,7 +110,7 @@ public class MenuScreen implements Screen {
             int x = Gdx.graphics.getWidth() / 2 - widget.getWidth() / 2;
 
             widget.setPosition(x, current_y);
-            widget.render(batch, shapeRenderer);
+            widget.render(batch, lineShapeRenderer, filledShapeRenderer);
         }
         // FIXME: Vandini....
         font.draw(batch, "Metris", -100, -100); // For some reason the last draw text is not rendered, so we add a dummy text here
@@ -134,7 +138,8 @@ public class MenuScreen implements Screen {
 
     @Override
     public void dispose() {
-        shapeRenderer.dispose();
+        lineShapeRenderer.dispose();
+        filledShapeRenderer.dispose();
     }
 
     public void nextFocussedWidget() {

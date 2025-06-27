@@ -46,7 +46,7 @@ public class Widget {
         // Override in subclasses if needed
     }
 
-    public void render(Batch batch, ShapeRenderer shapeRenderer){
+    public void render(Batch batch, ShapeRenderer lineShapeRenderer, ShapeRenderer filledShapeRenderer){
         // Default implementation does nothing
         // Override in subclasses to provide rendering logic
     };

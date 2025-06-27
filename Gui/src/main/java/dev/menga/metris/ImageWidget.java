@@ -19,7 +19,7 @@ public class ImageWidget extends  Widget {
         this.setWidth(texture.getWidth());
     }
 
-    public void render(Batch batch, ShapeRenderer shapeRenderer) {
+    public void render(Batch batch, ShapeRenderer lineShapeRenderer, ShapeRenderer filledShapeRenderer) {
         if (texture != null) {
             batch.draw(texture, getX(), getY());
         }

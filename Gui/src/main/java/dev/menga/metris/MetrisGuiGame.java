@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 public class MetrisGuiGame extends Game {
 
@@ -18,13 +19,37 @@ public class MetrisGuiGame extends Game {
     @Getter
     private Resources resources;
     private MenuScreen titleMenu;
+    private ArrayList<Widget> menuWidgetList;
+
+    public Options options = new Options();
+//    private MenuScreen settingsMenu;
 
     @Override
     public void create() {
         this.batch = new SpriteBatch();
         this.resources = new Resources();
         this.titleMenu = new MenuScreen(this);
+//        this.options = new Options();
+//        this.settingsMenu = new MenuScreen(this);
         this.setScreen(this.titleMenu);
+
+        options = Options.loadGameState();
+
+        ArrayList<Widget> settingsWidgetList = new ArrayList() {
+            {
+                add(new CheckBox(titleMenu, "Drop places blocks on the ground", options.isSpacePlacesBlocks (), (Boolean checked) -> {
+                    Metris.getLogger().info("Toggled dropping blocks on the ground");
+                    options.setSpacePlacesBlocks(checked);
+                    Options.saveGameState(options);
+                }));
+//                add(new MenuButton(titleMenu, "Back to Main Menu", () -> {
+//                    Metris.getLogger().info("Returning to main menu...");
+//                    titleMenu.setWidgets(menuWidgetList);
+//                }));
+            }
+        };
+
+//        this.settingsMenu.setWidgets(settingsWidgetList);
 
         ArrayList<Widget> menuWidgetList = new ArrayList() {
             {
@@ -35,10 +60,11 @@ public class MetrisGuiGame extends Game {
                     titleMenu.getGame().setScreen(new SingleplayerGameScreen(titleMenu.getGame()));
                 }));
                 add(new MenuButton(titleMenu, "Multiplayer", () -> {
-                    Metris.getLogger().info("Opening settings...");
+                    Metris.getLogger().info("Opening multiplayer...");
                 }));
-                add(new MenuButton(titleMenu, "Scores", () -> {
+                add(new MenuButton(titleMenu, "Settings", () -> {
                     Metris.getLogger().info("Opening settings...");
+                    titleMenu.setWidgets(settingsWidgetList);
                 }));
                 add(new MenuButton(titleMenu, "Help", () -> {
                     Metris.getLogger().info("Opening settings...");
@@ -52,6 +78,12 @@ public class MetrisGuiGame extends Game {
                 }));
             }
         };
+
+        settingsWidgetList.addLast(new MenuButton(titleMenu, "Back to Main Menu", () -> {
+            Metris.getLogger().info("Returning to main menu...");
+            titleMenu.setWidgets(menuWidgetList);
+        }));
+
         this.titleMenu.setWidgets(menuWidgetList);
 
         Pixmap pixmap = new Pixmap(Gdx.files.internal("cursor.png"));

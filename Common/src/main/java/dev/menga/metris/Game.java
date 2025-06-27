@@ -4,6 +4,7 @@ import java.util.*;
 
 import dev.menga.metris.utils.Vec2i;
 import lombok.Getter;
+import lombok.Setter;
 
 public abstract class Game {
 
@@ -45,6 +46,10 @@ public abstract class Game {
     @Getter
     long elapsed = 0;
     long gravityTimer = 0;
+
+    @Getter
+    @Setter
+    private boolean SpacePlacesBlocks = false;
 
     /**
      * Will move bagB into bagA and refills bagB with new tetrominos.
@@ -161,16 +166,21 @@ public abstract class Game {
         this.gravityTimer = 0;
     }
 
-    public void hardDrop() {
+    public void hardDrop(boolean placeImmediately) {
         if (this.isGameOver()) {
             return;
         }
 
         if (!this.testPlacement(this.getPosition().add(0, -1))) {
-            this.place();
+            if (!placeImmediately) {
+                this.place();
+            }
         } else {
             this.position = this.getHardDropPosition();
             this.gravityTimer = 0;
+        }
+        if (placeImmediately) {
+            this.place();
         }
     }
 
