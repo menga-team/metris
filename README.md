@@ -16,7 +16,8 @@ classic Tetris mechanics with a few modern twists.
 
 # Installation
 
-> The following steps will get Metris running on your Ubuntu machine:
+> The following steps will get Metris running on your Ubuntu machine (since the game is GUI based, it is recommended to run it on a desktop
+> environment).:
 
 1. **Install Java and Git and Maven:**
    ```bash
@@ -37,14 +38,14 @@ classic Tetris mechanics with a few modern twists.
 
 ---
 
-# 🧭 Overview
+# Overview
 
 Metris is a desktop Tetris game that faithfully recreates the classic experience while adding modern usability features. The game is built with Java and libGDX,
 and supports both solo play and local multiplayer. The project is modular, separating core game logic from GUI code, and is designed for easy extension.
 
 ---
 
-# 📑 User's Guide
+# User's Guide
 
 - **Launching:** Start the game to access the main menu, where you can choose between singleplayer, multiplayer, settings, help, about, or exit.
 - **Controls:**
@@ -73,7 +74,7 @@ and supports both solo play and local multiplayer. The project is modular, separ
 └── ...
 ```
 
-## 🧩 Components
+## Components
 
 - **Common:** Core Tetris logic (game state, field, tetrominoes, scoring, etc.)
 - **Gui:** All graphical interface code, screens, widgets, and menu logic
@@ -82,7 +83,7 @@ and supports both solo play and local multiplayer. The project is modular, separ
 
 ---
 
-# 🎮 Game Features
+# Game Features
 
 - **Classic Tetris gameplay:** 7-bag randomizer, SRS rotation, hold, hard/soft drop, scoring, and level progression.
 - **Modern GUI:** Responsive menus, custom cursor, and smooth transitions.
@@ -91,14 +92,14 @@ and supports both solo play and local multiplayer. The project is modular, separ
 
 ---
 
-# 📦 External Libraries
+# External Libraries
 
 - [libGDX](https://libgdx.com/) – Cross-platform game framework
 - [Lombok](https://projectlombok.org/) – Reduces Java boilerplate
 
 ---
 
-# 🖥️ Algorithms & Techniques
+# Algorithms & Techniques
 
 - **7-bag randomizer:** Ensures fair tetromino distribution.
 - **Super Rotation System (SRS):** Standardized piece rotation and wall kicks.
@@ -106,7 +107,7 @@ and supports both solo play and local multiplayer. The project is modular, separ
 
 ---
 
-# 🧑‍💻 Team Experience
+# Team Experience
 
 > *This project was a deep dive into game architecture, GUI design, and the nuances of Tetris mechanics. We learned to balance classic gameplay with modern
 usability, and to structure code for clarity and extensibility. Challenges included implementing SRS rotation, managing game state transitions, and optimizing
@@ -114,7 +115,7 @@ asset loading for smooth user experience.*
 
 ---
 
-# 🗃️ Git Usage
+# Git Usage
 
 - The project uses Git for version control.
 
